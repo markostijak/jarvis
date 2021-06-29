@@ -1,0 +1,6 @@
+com.mscode.jarvis.services.mysql.DeployMySql=\
+  com.mscode.jarvis.services.mysql.MySqlConfiguration
+com.mscode.jarvis.services.redis.DeployRedis=\
+  com.mscode.jarvis.services.redis.RedisConfiguration
+org.springframework.test.context.TestExecutionListener=\
+com.mscode.jarvis.runner.JarvisExecutionListener

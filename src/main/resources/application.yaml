@@ -1,0 +1,8 @@
+jarvis:
+  mysql:
+    name: test
+    username: root
+    password: toor
+  redis:
+    host: redis
+    port: 6793
