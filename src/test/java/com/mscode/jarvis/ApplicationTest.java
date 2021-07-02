@@ -1,12 +1,16 @@
 package com.mscode.jarvis;
 
-import com.mscode.jarvis.services.DeployAll;
+import com.mscode.jarvis.runner.JarvisTest;
+import com.mscode.jarvis.services.mysql.DeployMySql;
+import com.mscode.jarvis.services.redis.DeployRedis;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@DeployAll
+@JarvisTest
+@DeployMySql(order = 1)
+@DeployRedis(order = 2)
 class ApplicationTest {
 
     @Autowired

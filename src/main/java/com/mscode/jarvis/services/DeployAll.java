@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@DeployRedis(order = 1)
-@DeployMySql(order = 2)
+@DeployMySql
+@DeployRedis
 public @interface DeployAll {
 }

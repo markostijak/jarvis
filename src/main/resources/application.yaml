@@ -1,8 +1,14 @@
 jarvis:
-  mysql:
-    name: test
-    username: root
-    password: toor
-  redis:
-    host: redis
-    port: 6793
+  runner:
+    kubernetes:
+      context: 'test'
+    docker-compose:
+      context: 'test'
+  services:
+    mysql:
+      username: root
+      password: toor
+      url: 'jdbc:mysql://localhost:3306/test'
+    redis:
+      host: localhost
+      port: 6379

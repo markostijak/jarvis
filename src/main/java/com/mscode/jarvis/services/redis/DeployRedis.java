@@ -1,9 +1,6 @@
 package com.mscode.jarvis.services.redis;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -16,11 +13,11 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration
 @ImportAutoConfiguration
 public @interface DeployRedis {
 
     int order() default 0;
+
+    boolean flushAllBeforeTest() default false;
 
 }
