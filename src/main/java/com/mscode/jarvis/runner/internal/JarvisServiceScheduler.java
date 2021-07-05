@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.mscode.jarvis.runner.internal.MergedAnnotationUtils.findAll;
+import static com.mscode.jarvis.runner.internal.utils.MergedAnnotationUtils.findAll;
 import static java.util.Collections.emptyList;
 
 @Slf4j

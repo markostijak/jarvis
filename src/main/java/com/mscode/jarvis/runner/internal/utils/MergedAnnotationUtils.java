@@ -1,4 +1,4 @@
-package com.mscode.jarvis.runner.internal;
+package com.mscode.jarvis.runner.internal.utils;
 
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
