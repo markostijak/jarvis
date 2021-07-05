@@ -8,11 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 
 @JarvisTest
-@DeployKafka
 @DeployMySql
 @DeployRedis
+@DeployKafka
 class ApplicationTest {
 
     @Autowired
@@ -20,6 +21,9 @@ class ApplicationTest {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private KafkaTemplate<Object, Object> kafkaTemplate;
 
     @Test
     public void test() {

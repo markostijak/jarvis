@@ -17,4 +17,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ImportAutoConfiguration
 public @interface DeployKafka {
+
+    int delayed() default 10;
+
 }

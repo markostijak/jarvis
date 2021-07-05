@@ -1,5 +1,6 @@
 package com.mscode.jarvis.services;
 
+import com.mscode.jarvis.services.kafka.DeployKafka;
 import com.mscode.jarvis.services.mysql.DeployMySql;
 import com.mscode.jarvis.services.redis.DeployRedis;
 
@@ -16,5 +17,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @DeployMySql
 @DeployRedis
+@DeployKafka
 public @interface DeployAll {
 }

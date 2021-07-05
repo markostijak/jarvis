@@ -2,6 +2,7 @@ package com.mscode.jarvis.runner.internal;
 
 import com.mscode.jarvis.runner.DeploymentDescriptor;
 import com.mscode.jarvis.runner.annotations.Deployment;
+import com.mscode.jarvis.runner.internal.utils.ServiceUtils;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.MergedAnnotation;
@@ -12,9 +13,13 @@ import org.springframework.test.context.TestExecutionListener;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
+import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.concurrent.CompletableFuture.runAsync;
 
 @Slf4j
 @Order(Integer.MIN_VALUE)
@@ -22,33 +27,37 @@ public class JarvisServiceScheduler implements TestExecutionListener {
 
     private static final String SERVICES = JarvisServiceScheduler.class.getName() + ".services";
 
-    private final KubernetesClient k8s;
+    private final KubernetesClient client;
     private final ServiceFactory serviceFactory;
     private final Map<String, DeploymentDescriptor> descriptors;
 
-    public JarvisServiceScheduler(KubernetesClient k8s,
+    public JarvisServiceScheduler(KubernetesClient client,
                                   ServiceFactory serviceFactory,
                                   Map<String, DeploymentDescriptor> descriptors) {
-        this.k8s = k8s;
+        this.client = client;
         this.descriptors = descriptors;
         this.serviceFactory = serviceFactory;
     }
 
     @Override
-    public void beforeTestClass(TestContext testContext) throws Exception {
+    public void beforeTestClass(TestContext testContext) {
         List<Service> services = testContext.computeAttribute(SERVICES, s -> getServices(testContext));
-        for (Service service : services) {
-            log.info("Starting {} service", service.getName());
-            k8s.resourceList(service.getResources()).createOrReplaceAnd().waitUntilReady(1, TimeUnit.MINUTES);
-        }
+        ServiceUtils.groupByOrder(services).stream().map(group -> group.stream().map(service -> runAsync(() -> {
+            try {
+                log.info("Starting {} service", service.getName());
+                service.start(client).waitUntilReady(1, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                throw new CompletionException("Service " + service.getName() + " is not ready!", e);
+            }
+        })).toArray(CompletableFuture[]::new)).forEach(array -> allOf(array).join());
     }
 
     @Override
-    public void afterTestClass(TestContext testContext) throws Exception {
+    public void afterTestClass(TestContext testContext) {
         List<Service> services = testContext.computeAttribute(SERVICES, s -> emptyList());
         for (Service service : services) {
             log.info("Stopping {} service", service.getName());
-            k8s.resourceList(service.getResources()).delete();
+            service.stop(client);
         }
     }
 

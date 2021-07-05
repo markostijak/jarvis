@@ -32,10 +32,9 @@ jarvis:
     kafka:
       connection:
         bootstrap-servers: 'kafka:9092'
-        properties:
-          schema.registry.url: 'http://kafka:8081'
-        producer:
-          client-id: 'jarvis'
+        consumer:
+          group-id: 'jarvis'
+          auto-offset-reset: 'latest'
       deployment:
         paths:
           - 'kafka.yaml'
@@ -56,3 +55,5 @@ jarvis:
       connection:
         host: 'localhost'
         port: 32379
+    kafka:
+      bootstrap-servers: 'localhost:32092'

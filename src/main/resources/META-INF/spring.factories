@@ -13,4 +13,4 @@ org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 # Kafka configuration
 com.mscode.jarvis.services.kafka.DeployKafka=\
 com.mscode.jarvis.services.kafka.KafkaConfiguration,\
-org.springframework.kafka.annotation.KafkaListenerConfigurationSelector
+org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
