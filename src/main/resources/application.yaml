@@ -19,7 +19,7 @@ jarvis:
         paths:
           - 'mysql.yaml'
         env:
-          test: 'mysql'
+          name: 'mysql'
     redis:
       connection:
         host: 'localhost'
@@ -28,8 +28,19 @@ jarvis:
         paths:
           - 'redis.yaml'
         env:
-          test: 'redis'
-
+          name: 'redis'
+    kafka:
+      connection:
+        bootstrap-servers: 'kafka:9092'
+        properties:
+          schema.registry.url: 'http://kafka:8081'
+        producer:
+          client-id: 'jarvis'
+      deployment:
+        paths:
+          - 'kafka.yaml'
+        env:
+          name: 'kafka'
 ---
 spring:
   config:

@@ -42,7 +42,7 @@ public class ServiceFactory {
                 .flatMap(podSpec -> podSpec.getContainers().stream())
                 .forEach(container -> addEnv(container, env));
 
-        return new Service(name, resources);
+        return new Service(name, descriptor, resources, deployment);
     }
 
     protected static Map<String, String> mergeEnv(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {

@@ -56,7 +56,8 @@ public class JarvisServiceScheduler implements TestExecutionListener {
         List<MergedAnnotation<Deployment>> all = MergedAnnotations.from(testContext.getTestClass())
                 .stream(Deployment.class).toList();
 
-        return all.stream().map(m -> serviceFactory.create(findDescriptor(descriptors, m), m)).toList();
+        return all.stream().filter(annotation -> annotation.hasNonDefaultValue("name"))
+                .map(annotation -> serviceFactory.create(findDescriptor(descriptors, annotation), annotation)).toList();
     }
 
     private DeploymentDescriptor findDescriptor(Map<String, DeploymentDescriptor> descriptors, MergedAnnotation<Deployment> annotation) {
