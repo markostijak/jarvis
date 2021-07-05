@@ -1,4 +1,4 @@
-package com.mscode.jarvis.runner;
+package com.mscode.jarvis.runner.internal;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -14,37 +14,37 @@ public class JarvisDelegatingListener implements TestExecutionListener {
     private static final String LISTENERS = JarvisDelegatingListener.class.getName() + ".listeners";
 
     @Override
-    public void beforeTestClass(TestContext testContext) throws Exception {
+    public void beforeTestClass(TestContext testContext) {
         forEachListener(testContext, l -> l.beforeTestClass(testContext));
     }
 
     @Override
-    public void prepareTestInstance(TestContext testContext) throws Exception {
+    public void prepareTestInstance(TestContext testContext) {
         forEachListener(testContext, l -> l.prepareTestInstance(testContext));
     }
 
     @Override
-    public void beforeTestMethod(TestContext testContext) throws Exception {
+    public void beforeTestMethod(TestContext testContext) {
         forEachListener(testContext, l -> l.beforeTestMethod(testContext));
     }
 
     @Override
-    public void beforeTestExecution(TestContext testContext) throws Exception {
+    public void beforeTestExecution(TestContext testContext) {
         forEachListener(testContext, l -> l.beforeTestExecution(testContext));
     }
 
     @Override
-    public void afterTestExecution(TestContext testContext) throws Exception {
+    public void afterTestExecution(TestContext testContext) {
         forEachListener(testContext, l -> l.afterTestExecution(testContext));
     }
 
     @Override
-    public void afterTestMethod(TestContext testContext) throws Exception {
+    public void afterTestMethod(TestContext testContext) {
         forEachListener(testContext, l -> l.afterTestMethod(testContext));
     }
 
     @Override
-    public void afterTestClass(TestContext testContext) throws Exception {
+    public void afterTestClass(TestContext testContext) {
         forEachListener(testContext, l -> l.afterTestClass(testContext));
     }
 
@@ -54,6 +54,7 @@ public class JarvisDelegatingListener implements TestExecutionListener {
                 consumer.accept(listener);
             } catch (Exception e) {
                 log.error("Exception occurred while executing {}", listener.getClass().getSimpleName(), e);
+                throw new IllegalStateException(e);
             }
         }
     }

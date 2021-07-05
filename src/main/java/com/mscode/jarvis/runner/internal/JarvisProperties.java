@@ -1,12 +1,12 @@
-package com.mscode.jarvis.runner;
+package com.mscode.jarvis.runner.internal;
 
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
 
 @Data
-@Component
 @ConfigurationProperties(prefix = "jarvis.runner")
 public class JarvisProperties {
 
@@ -20,12 +20,16 @@ public class JarvisProperties {
 
         private String context;
 
+        private Path basePath = Path.of("/");
+
     }
 
     @Data
     public static class DockerCompose {
 
         private String context;
+
+        private Path basePath = Path.of("/");
 
     }
 

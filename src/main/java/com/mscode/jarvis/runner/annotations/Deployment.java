@@ -1,7 +1,6 @@
-package com.mscode.jarvis.services.mysql;
+package com.mscode.jarvis.runner.annotations;
 
-import com.mscode.jarvis.runner.annotations.Deployment;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -12,14 +11,14 @@ import java.lang.annotation.Target;
 
 @Inherited
 @Documented
-@Deployment("mysql")
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@ImportAutoConfiguration
-public @interface DeployMySql {
+public @interface Deployment {
 
-    int order() default 0;
+    @AliasFor("name")
+    String value() default "";
 
-    String[] env() default {};
+    @AliasFor("value")
+    String name() default "";
 
 }
