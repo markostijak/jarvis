@@ -4,9 +4,8 @@ import com.mscode.jarvis.runner.DeploymentDescriptor;
 import com.mscode.jarvis.runner.annotations.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.MergedAnnotation;
+import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.Order;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.mscode.jarvis.runner.internal.utils.MergedAnnotationUtils.findAll;
 import static java.util.Collections.emptyList;
 
 @Slf4j
@@ -26,10 +24,13 @@ public class JarvisServiceScheduler implements TestExecutionListener {
 
     private final KubernetesClient k8s;
     private final ServiceFactory serviceFactory;
+    private final Map<String, DeploymentDescriptor> descriptors;
 
-    @Autowired
-    public JarvisServiceScheduler(KubernetesClient k8s, ServiceFactory serviceFactory) {
+    public JarvisServiceScheduler(KubernetesClient k8s,
+                                  ServiceFactory serviceFactory,
+                                  Map<String, DeploymentDescriptor> descriptors) {
         this.k8s = k8s;
+        this.descriptors = descriptors;
         this.serviceFactory = serviceFactory;
     }
 
@@ -37,6 +38,7 @@ public class JarvisServiceScheduler implements TestExecutionListener {
     public void beforeTestClass(TestContext testContext) throws Exception {
         List<Service> services = testContext.computeAttribute(SERVICES, s -> getServices(testContext));
         for (Service service : services) {
+            log.info("Starting {} service", service.getName());
             k8s.resourceList(service.getResources()).createOrReplaceAnd().waitUntilReady(1, TimeUnit.MINUTES);
         }
     }
@@ -45,27 +47,28 @@ public class JarvisServiceScheduler implements TestExecutionListener {
     public void afterTestClass(TestContext testContext) throws Exception {
         List<Service> services = testContext.computeAttribute(SERVICES, s -> emptyList());
         for (Service service : services) {
+            log.info("Stopping {} service", service.getName());
             k8s.resourceList(service.getResources()).delete();
         }
     }
 
-    private List<Service> getServices(TestContext testContext) {
-        ApplicationContext context = testContext.getApplicationContext();
-        Map<String, DeploymentDescriptor> deployments = context.getBeansOfType(DeploymentDescriptor.class);
-        List<MergedAnnotation<Deployment>> all = findAll(testContext.getTestClass(), Deployment.class);
+    protected List<Service> getServices(TestContext testContext) {
+        List<MergedAnnotation<Deployment>> all = MergedAnnotations.from(testContext.getTestClass())
+                .stream(Deployment.class).toList();
 
-        return all.stream().map(m -> createService(deployments, m)).toList();
+        return all.stream().map(m -> serviceFactory.create(findDescriptor(descriptors, m), m)).toList();
     }
 
-    private Service createService(Map<String, DeploymentDescriptor> descriptors, MergedAnnotation<Deployment> deployment) {
-        String deploymentName = deployment.getString("name");
-        DeploymentDescriptor deploymentDescriptor = findDeploymentDescriptor(deploymentName, descriptors);
-        return serviceFactory.create(deploymentDescriptor, deployment);
-    }
+    private DeploymentDescriptor findDescriptor(Map<String, DeploymentDescriptor> descriptors, MergedAnnotation<Deployment> annotation) {
+        String name = annotation.getString("name");
+        DeploymentDescriptor descriptor = descriptors.get(name);
 
-    private DeploymentDescriptor findDeploymentDescriptor(String name, Map<String, DeploymentDescriptor> deployments) {
-        return deployments.entrySet().stream().filter(e -> e.getKey().toLowerCase().startsWith(name.toLowerCase()))
-                .findFirst().map(Map.Entry::getValue).orElse(DeploymentDescriptor.empty());
+        if (descriptor == null) {
+            log.warn("Unable to find deployment descriptor for {} service. Using empty one!", name);
+            return DeploymentDescriptor.empty();
+        }
+
+        return descriptor;
     }
 
 }

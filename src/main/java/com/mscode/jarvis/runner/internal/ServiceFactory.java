@@ -29,9 +29,6 @@ public class ServiceFactory {
 
     public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         String name = deployment.getString("name");
-        MergedAnnotation<?> annotation = deployment.getMetaSource();
-
-        Assert.notNull(annotation, "Annotation can't be null");
 
         List<HasMetadata> resources = descriptor.getPaths().stream()
                 .flatMap(p -> getResources(client, basePath.resolve(p)).stream())
@@ -39,7 +36,7 @@ public class ServiceFactory {
 
         Assert.notEmpty(resources, "Missing resources for " + name + " deployment!");
 
-        Map<String, String> env = mergeEnv(descriptor, annotation);
+        Map<String, String> env = mergeEnv(descriptor, deployment);
 
         resources.stream().map(KubernetesUtils::getPodSpec).filter(Objects::nonNull)
                 .flatMap(podSpec -> podSpec.getContainers().stream())
@@ -48,13 +45,14 @@ public class ServiceFactory {
         return new Service(name, resources);
     }
 
-    protected static Map<String, String> mergeEnv(DeploymentDescriptor descriptor, MergedAnnotation<?> annotation) {
+    protected static Map<String, String> mergeEnv(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         Map<String, String> env = new HashMap<>(descriptor.getEnv());
 
-        if (annotation.hasNonDefaultValue("env")) {
-            String[] envs = annotation.getStringArray("env");
+        if (deployment.hasNonDefaultValue("env")) {
+            String[] envs = deployment.getStringArray("env");
             for (String e : envs) {
                 String[] parts = e.split("=");
+                Assert.state(parts.length % 2 == 0, "Envs must be defined in 'key=value' format!");
                 env.put(parts[0], parts[1]);
             }
         }

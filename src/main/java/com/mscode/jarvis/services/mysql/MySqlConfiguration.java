@@ -1,6 +1,5 @@
 package com.mscode.jarvis.services.mysql;
 
-import com.mscode.jarvis.runner.DeploymentDescriptor;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +16,6 @@ public class MySqlConfiguration {
     @ConfigurationProperties(prefix = "jarvis.services.mysql.connection")
     public DataSourceProperties mysqlProperties() {
         return new DataSourceProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "jarvis.services.mysql.deployment")
-    public DeploymentDescriptor mySqlDeploymentDescriptor() {
-        return new DeploymentDescriptor();
     }
 
 }

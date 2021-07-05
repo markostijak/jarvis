@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @JarvisTest
-@DeployMySql(order = 1, env = "test:test")
+@DeployMySql(order = 1)
 @DeployRedis(order = 2)
 class ApplicationTest {
 

@@ -11,9 +11,10 @@ import java.lang.annotation.Target;
 
 @Inherited
 @Documented
-@Target(ElementType.ANNOTATION_TYPE)
+@Deployment
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Deployment {
+public @interface Deploy {
 
     @AliasFor("name")
     String value() default "";
@@ -21,6 +22,10 @@ public @interface Deployment {
     @AliasFor("value")
     String name() default "";
 
+    int order() default 0;
+
     String[] env() default {};
+
+    int delay() default -1;
 
 }
