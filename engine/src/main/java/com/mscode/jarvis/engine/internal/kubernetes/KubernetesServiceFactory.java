@@ -31,7 +31,7 @@ public class KubernetesServiceFactory implements ServiceFactory {
     public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         String name = deployment.getString("name");
 
-        List<HasMetadata> resources = descriptor.getPaths().stream()
+        List<HasMetadata> resources = descriptor.getK8s().stream()
                 .flatMap(p -> loadFromYaml(client, basePath.resolve(p)).stream())
                 .toList();
 

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import java.util.Map;
 
@@ -36,21 +35,23 @@ public class JarvisConfiguration {
     }
 
     @Bean
-    @Profile("!docker")
     public KubernetesClient k8sClient() {
         return new DefaultKubernetesClient();
     }
 
     @Bean
-    @Profile("!docker")
     public KubernetesServiceFactory kubernetesServiceFactory() {
         return new KubernetesServiceFactory(properties.getRunner().getKubernetes().getBasePath(), k8sClient());
     }
 
     @Bean
-    @Profile("docker")
     public DockerServiceFactory dockerServiceFactory() {
         return new DockerServiceFactory();
+    }
+
+    @Bean
+    public JarvisDelegatingFactory serviceFactory() {
+        return new JarvisDelegatingFactory(dockerServiceFactory(), kubernetesServiceFactory());
     }
 
     @Bean

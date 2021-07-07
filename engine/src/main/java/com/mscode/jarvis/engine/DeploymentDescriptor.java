@@ -17,7 +17,17 @@ public class DeploymentDescriptor {
     /**
      *
      */
-    private List<Path> paths = emptyList();
+    private List<Path> k8s = emptyList();
+
+    /**
+     *
+     */
+    private String image;
+
+    /**
+     *
+     */
+    private List<String> ports;
 
     /**
      *
