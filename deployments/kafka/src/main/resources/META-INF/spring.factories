@@ -1,0 +1,3 @@
+com.mscode.jarvis.deployment.kafka.DeployKafka=\
+com.mscode.jarvis.deployment.kafka.KafkaConfiguration,\
+org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
