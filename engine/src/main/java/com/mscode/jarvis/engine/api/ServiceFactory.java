@@ -8,4 +8,6 @@ public interface ServiceFactory {
 
     Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment);
 
+    boolean supports(DeploymentDescriptor descriptor);
+
 }

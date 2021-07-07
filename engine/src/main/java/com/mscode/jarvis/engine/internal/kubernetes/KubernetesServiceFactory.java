@@ -46,6 +46,11 @@ public class KubernetesServiceFactory implements ServiceFactory {
         return new KubernetesService(client, resources, deployment);
     }
 
+    @Override
+    public boolean supports(DeploymentDescriptor descriptor) {
+        return !descriptor.getK8s().isEmpty();
+    }
+
     protected static Map<String, String> mergeEnv(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         Map<String, String> env = new HashMap<>(descriptor.getEnv());
 

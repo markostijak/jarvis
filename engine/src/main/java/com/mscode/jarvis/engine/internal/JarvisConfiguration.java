@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
+import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
@@ -40,18 +42,21 @@ public class JarvisConfiguration {
     }
 
     @Bean
+    @Order(1)
     public KubernetesServiceFactory kubernetesServiceFactory() {
         return new KubernetesServiceFactory(properties.getRunner().getKubernetes().getBasePath(), k8sClient());
     }
 
     @Bean
+    @Order(2)
     public DockerServiceFactory dockerServiceFactory() {
         return new DockerServiceFactory();
     }
 
     @Bean
-    public JarvisDelegatingFactory serviceFactory() {
-        return new JarvisDelegatingFactory(dockerServiceFactory(), kubernetesServiceFactory());
+    @Autowired
+    public JarvisDelegatingFactory serviceFactory(List<ServiceFactory> serviceFactories) {
+        return new JarvisDelegatingFactory(serviceFactories);
     }
 
     @Bean

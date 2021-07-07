@@ -16,7 +16,6 @@
             <groupId>com.mscode.jarvis</groupId>
             <artifactId>jarvis-engine</artifactId>
             <version>1.0.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

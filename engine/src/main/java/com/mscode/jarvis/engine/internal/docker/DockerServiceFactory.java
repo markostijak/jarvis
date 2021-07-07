@@ -11,4 +11,10 @@ public class DockerServiceFactory implements ServiceFactory {
     public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         return null;
     }
+
+    @Override
+    public boolean supports(DeploymentDescriptor descriptor) {
+        return descriptor.getImage() != null;
+    }
+
 }
