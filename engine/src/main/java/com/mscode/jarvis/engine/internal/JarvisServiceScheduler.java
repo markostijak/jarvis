@@ -2,7 +2,7 @@ package com.mscode.jarvis.engine.internal;
 
 import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Service;
-import com.mscode.jarvis.engine.api.ServiceFactory;
+import com.mscode.jarvis.engine.internal.utils.JarvisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.Order;
@@ -10,7 +10,6 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
@@ -25,12 +24,10 @@ public class JarvisServiceScheduler implements TestExecutionListener {
 
     private static final String SERVICES = JarvisServiceScheduler.class.getName() + ".services";
 
-    private final ServiceFactory serviceFactory;
-    private final JarvisDescriptorRepository repository;
+    private final JarvisServiceFactory serviceFactory;
 
-    public JarvisServiceScheduler(ServiceFactory serviceFactory, JarvisDescriptorRepository repository) {
+    public JarvisServiceScheduler(JarvisServiceFactory serviceFactory) {
         this.serviceFactory = serviceFactory;
-        this.repository = repository;
     }
 
     @Override
@@ -57,9 +54,7 @@ public class JarvisServiceScheduler implements TestExecutionListener {
 
     protected List<Service> getServices(TestContext testContext) {
         return MergedAnnotations.from(testContext.getTestClass()).stream(Deployment.class)
-                .map(a -> Map.entry(repository.getByName(a.getString("name")), a))
-                .map(e -> serviceFactory.create(e.getKey(), e.getValue()))
-                .toList();
+                .map(serviceFactory::create).toList();
     }
 
     private List<List<Service>> groupByOrder(List<Service> services) {

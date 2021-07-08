@@ -21,35 +21,7 @@ public class JarvisDescriptorRepository {
     }
 
     public DeploymentDescriptor getByName(String name) throws NoSuchElementException {
-        DeploymentDescriptor descriptor = descriptors.get(name);
-
-        if (descriptor == null) {
-            throw new NoSuchElementException(name + " deployment descriptor not found");
-        }
-
-        return descriptor;
-    }
-
-    public DeploymentDescriptor getByName(String name, DeploymentDescriptor defaultValue) {
-        DeploymentDescriptor descriptor = descriptors.get(name);
-
-        if (descriptor != null) {
-            return descriptor;
-        }
-
-        log.warn("Unable to find {} deployment descriptor. Using default!", name);
-        return defaultValue;
-    }
-
-    public DeploymentDescriptor getByNameOrEmpty(String name) {
-        DeploymentDescriptor descriptor = descriptors.get(name);
-
-        if (descriptor != null) {
-            return descriptor;
-        }
-
-        log.warn("Unable to find {} deployment descriptor. Using default!", name);
-        return DeploymentDescriptor.empty();
+        return findByName(name).orElseThrow(() -> new NoSuchElementException(name + " deployment descriptor"));
     }
 
 }

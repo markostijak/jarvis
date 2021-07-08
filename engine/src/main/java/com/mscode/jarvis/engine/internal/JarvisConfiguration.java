@@ -55,13 +55,14 @@ public class JarvisConfiguration {
 
     @Bean
     @Autowired
-    public JarvisDelegatingFactory serviceFactory(List<ServiceFactory> serviceFactories) {
-        return new JarvisDelegatingFactory(serviceFactories);
+    public JarvisServiceFactory jarvisServiceFactory(List<ServiceFactory> serviceFactories) {
+        return new JarvisServiceFactory(descriptorRepository(), serviceFactories);
     }
 
     @Bean
-    public JarvisServiceScheduler jarvisServiceScheduler(ServiceFactory serviceFactory) {
-        return new JarvisServiceScheduler(serviceFactory, descriptorRepository());
+    @Autowired
+    public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory serviceFactory) {
+        return new JarvisServiceScheduler(serviceFactory);
     }
 
 }
