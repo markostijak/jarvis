@@ -3,7 +3,10 @@ package com.mscode.jarvis.engine.internal.kubernetes;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
+import io.fabric8.kubernetes.api.model.PodTemplateSpec;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.api.model.apps.DaemonSet;
@@ -11,11 +14,14 @@ import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.dsl.PrettyLoggable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +36,34 @@ public class KubernetesUtils {
         } catch (IOException e) {
             throw new UncheckedIOException("Unable to read file " + yaml, e);
         }
+    }
+
+    public static List<Pod> listPods(KubernetesClient client, String namespace, String name) {
+        return client.pods().inNamespace(namespace).withLabel("app", name).list().getItems();
+    }
+
+    public static List<Pod> listPods(KubernetesClient client, List<HasMetadata> resources) {
+        List<Pod> pods = new ArrayList<>();
+
+        for (HasMetadata resource : resources) {
+            if (hasPodSpec(resource)) {
+                ObjectMeta metadata = resource.getMetadata();
+                pods.addAll(listPods(client, metadata.getNamespace(), metadata.getName()));
+            }
+        }
+
+        return pods;
+    }
+
+    public static PrettyLoggable<LogWatch> logs(KubernetesClient client, Pod pod, Container container) {
+        return client.pods().inNamespace(pod.getMetadata().getNamespace())
+                .withName(pod.getMetadata().getName())
+                .inContainer(container.getName())
+                .tailingLines(1000);
+    }
+
+    public static boolean hasPodSpec(HasMetadata metadata) {
+        return getPodSpec(metadata) != null;
     }
 
     public static PodSpec getPodSpec(HasMetadata metadata) {
@@ -47,6 +81,26 @@ public class KubernetesUtils {
 
         if (metadata instanceof Deployment deployment) {
             return deployment.getSpec().getTemplate().getSpec();
+        }
+
+        return null;
+    }
+
+    public static PodTemplateSpec getPodTemplateSpec(HasMetadata metadata) {
+        if (metadata instanceof Job job) {
+            return job.getSpec().getTemplate();
+        }
+
+        if (metadata instanceof DaemonSet daemonSet) {
+            return daemonSet.getSpec().getTemplate();
+        }
+
+        if (metadata instanceof CronJob cronJob) {
+            return cronJob.getSpec().getJobTemplate().getSpec().getTemplate();
+        }
+
+        if (metadata instanceof Deployment deployment) {
+            return deployment.getSpec().getTemplate();
         }
 
         return null;

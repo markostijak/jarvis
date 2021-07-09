@@ -44,7 +44,8 @@ public class JarvisConfiguration {
     @Bean
     @Order(1)
     public KubernetesServiceFactory kubernetesServiceFactory() {
-        return new KubernetesServiceFactory(properties.getRunner().getKubernetes().getBasePath(), k8sClient());
+        JarvisProperties.Kubernetes k8s = properties.getRunner().getKubernetes();
+        return new KubernetesServiceFactory(k8sClient(), k8s.getBasePath(), k8s.getNamespace());
     }
 
     @Bean
@@ -62,7 +63,7 @@ public class JarvisConfiguration {
     @Bean
     @Autowired
     public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory serviceFactory) {
-        return new JarvisServiceScheduler(serviceFactory);
+        return new JarvisServiceScheduler(serviceFactory, properties.getRunner().getLogsDirectory());
     }
 
 }

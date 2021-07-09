@@ -28,6 +28,10 @@ public class JarvisProperties {
         /**
          *
          */
+        private Path logsDirectory = Path.of(System.getProperty("user.dir")).resolve("target").resolve("jarvis");
+        /**
+         *
+         */
         public Kubernetes kubernetes = new Kubernetes();
 
         /**
@@ -48,6 +52,8 @@ public class JarvisProperties {
          *
          */
         private Path basePath = Path.of("/");
+
+        private String namespace = "default";
     }
 
     @Data

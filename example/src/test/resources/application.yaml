@@ -6,7 +6,7 @@ jarvis:
   runner:
     kubernetes:
       context: 'test'
-      base-path: 'C:\Development\Java\jarvis\k8s'
+      base-path: '${user.dir}/../k8s'
     docker-compose:
       context: 'test'
   services:
@@ -40,6 +40,7 @@ jarvis:
           - 'kafka.yaml'
         env:
           name: 'kafka'
+
 ---
 spring:
   config:

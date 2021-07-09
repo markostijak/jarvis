@@ -21,4 +21,6 @@ public @interface Deployment {
 
     String[] env() default {};
 
+    int delayed() default 0;
+
 }
