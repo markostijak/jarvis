@@ -9,7 +9,6 @@ spec:
   ports:
     - port: 6379
       targetPort: 6379
-      nodePort: 32379
   type: NodePort
 ---
 apiVersion: apps/v1

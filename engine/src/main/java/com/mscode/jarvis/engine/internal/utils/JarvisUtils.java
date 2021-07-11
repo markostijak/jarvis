@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.stream.Collectors.toMap;
+
 public class JarvisUtils {
 
     public static Path prepareDirectory(Path directory, Class<?> clazz) throws IOException {
@@ -37,6 +39,11 @@ public class JarvisUtils {
         }
 
         return env;
+    }
+
+    public static Map<Integer, Integer> parsePorts(DeploymentDescriptor descriptor) {
+        return descriptor.getPorts().stream().map(p -> p.split(":"))
+                .collect(toMap(p -> Integer.parseInt(p[0]), p -> Integer.parseInt(p[1])));
     }
 
 }

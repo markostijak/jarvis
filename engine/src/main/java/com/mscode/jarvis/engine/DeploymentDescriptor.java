@@ -27,7 +27,7 @@ public class DeploymentDescriptor {
     /**
      *
      */
-    private List<String> ports;
+    private List<String> ports = emptyList();
 
     /**
      *

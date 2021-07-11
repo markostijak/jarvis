@@ -10,7 +10,6 @@ spec:
     - name: bootstrap-server
       port: 9092
       targetPort: 9092
-      nodePort: 32092
     - name: schema-registry
       port: 8081
       targetPort: 8081

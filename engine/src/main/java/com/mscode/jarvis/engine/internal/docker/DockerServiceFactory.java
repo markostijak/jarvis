@@ -4,9 +4,22 @@ import com.mscode.jarvis.engine.DeploymentDescriptor;
 import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Service;
 import com.mscode.jarvis.engine.api.ServiceFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.MergedAnnotation;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
+@Order(3)
+@Component
 public class DockerServiceFactory implements ServiceFactory {
+
+    private final DockerProperties properties;
+
+    @Autowired
+    public DockerServiceFactory(DockerProperties properties) {
+        this.properties = properties;
+    }
+
     @Override
     public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         return null;

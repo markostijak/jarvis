@@ -1,21 +1,20 @@
 package com.mscode.jarvis.engine.internal;
 
 import com.mscode.jarvis.engine.api.ServiceFactory;
-import com.mscode.jarvis.engine.internal.docker.DockerServiceFactory;
-import com.mscode.jarvis.engine.internal.kubernetes.KubernetesServiceFactory;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
 
+@ComponentScan
 @Configuration
 @EnableConfigurationProperties(JarvisProperties.class)
 public class JarvisConfiguration {
@@ -42,28 +41,15 @@ public class JarvisConfiguration {
     }
 
     @Bean
-    @Order(1)
-    public KubernetesServiceFactory kubernetesServiceFactory() {
-        JarvisProperties.Kubernetes k8s = properties.getRunner().getKubernetes();
-        return new KubernetesServiceFactory(k8sClient(), k8s.getBasePath(), k8s.getNamespace());
-    }
-
-    @Bean
-    @Order(2)
-    public DockerServiceFactory dockerServiceFactory() {
-        return new DockerServiceFactory();
+    @Autowired
+    public JarvisServiceFactory jarvisServiceFactory(List<ServiceFactory> factories) {
+        return new JarvisServiceFactory(descriptorRepository(), factories);
     }
 
     @Bean
     @Autowired
-    public JarvisServiceFactory jarvisServiceFactory(List<ServiceFactory> serviceFactories) {
-        return new JarvisServiceFactory(descriptorRepository(), serviceFactories);
-    }
-
-    @Bean
-    @Autowired
-    public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory serviceFactory) {
-        return new JarvisServiceScheduler(serviceFactory, properties.getRunner().getLogsDirectory());
+    public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory factory) {
+        return new JarvisServiceScheduler(factory, properties.getRunner().getLogsDirectory());
     }
 
 }

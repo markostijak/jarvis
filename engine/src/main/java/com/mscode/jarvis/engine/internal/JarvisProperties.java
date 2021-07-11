@@ -12,10 +12,14 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "jarvis")
 public class JarvisProperties {
 
+    public static final String JARVIS = "jarvis";
+    public static final String JARVIS_RUNNER = JARVIS + ".runner";
+    public static final String JARVIS_SERVICES = JARVIS + ".services";
+
     /**
      *
      */
-    private Runner runner = new Runner();
+    private RunnerProperties runner = new RunnerProperties();
 
     /**
      *
@@ -23,51 +27,13 @@ public class JarvisProperties {
     public Map<String, Deployment> services = new HashMap<>();
 
     @Data
-    public static class Runner {
+    public static class RunnerProperties {
 
         /**
          *
          */
         private Path logsDirectory = Path.of(System.getProperty("user.dir")).resolve("target").resolve("jarvis");
-        /**
-         *
-         */
-        public Kubernetes kubernetes = new Kubernetes();
 
-        /**
-         *
-         */
-        public DockerCompose dockerCompose = new DockerCompose();
-    }
-
-    @Data
-    public static class Kubernetes {
-
-        /**
-         *
-         */
-        private String context;
-
-        /**
-         *
-         */
-        private Path basePath = Path.of("/");
-
-        private String namespace = "default";
-    }
-
-    @Data
-    public static class DockerCompose {
-
-        /**
-         *
-         */
-        private String context;
-
-        /**
-         *
-         */
-        private Path basePath = Path.of("/");
     }
 
     @Data

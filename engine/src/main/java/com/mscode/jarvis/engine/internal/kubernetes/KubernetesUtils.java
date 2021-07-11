@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
 import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.api.model.apps.DaemonSet;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -124,6 +125,16 @@ public class KubernetesUtils {
                 .toList();
 
         container.setEnv(envVars);
+    }
+
+    public static void replacePorts(ServiceSpec serviceSpec, Map<Integer, Integer> ports) {
+        ports.forEach((nodePort, port) -> {
+            for (ServicePort servicePort : serviceSpec.getPorts()) {
+                if (servicePort.getPort().equals(port)) {
+                    servicePort.setNodePort(nodePort);
+                }
+            }
+        });
     }
 
 }

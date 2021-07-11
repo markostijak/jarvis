@@ -5,6 +5,7 @@ import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Service;
 import com.mscode.jarvis.engine.api.ServiceFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.MergedAnnotation;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class JarvisServiceFactory {
     private final List<ServiceFactory> factories;
     private final JarvisDescriptorRepository repository;
 
+    @Autowired
     public JarvisServiceFactory(JarvisDescriptorRepository repository, List<ServiceFactory> factories) {
         this.repository = repository;
         this.factories = factories;
