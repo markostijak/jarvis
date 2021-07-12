@@ -15,9 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.listPods;
+import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.logs;
+import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.waitUntilReadyOrCompleted;
+import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.waitForDelay;
 
 public class KubernetesService implements Service {
 
@@ -42,10 +44,10 @@ public class KubernetesService implements Service {
         created = client.resourceList(resources).createOrReplace();
 
         if (delayed > 0) {
-            return (amount, timeUnit) -> TimeUnit.SECONDS.sleep(Math.min(timeUnit.toSeconds(amount), delayed));
+            return (amount, timeUnit) -> waitForDelay(delayed, amount, timeUnit);
         }
 
-        return (amount, timeUnit) -> client.resourceList(created).waitUntilReady(amount, timeUnit);
+        return (amount, timeUnit) -> waitUntilReadyOrCompleted(client, created, amount, timeUnit);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class KubernetesService implements Service {
             for (Container container : pod.getSpec().getContainers()) {
                 String filename = pod.getMetadata().getName() + "." + container.getName() + ".log";
 
-                LogWatch logWatch = KubernetesUtils.logs(client, pod, container)
+                LogWatch logWatch = logs(client, pod, container)
                         .watchLog(Files.newOutputStream(directory.resolve(filename)));
 
                 logWatches.add(logWatch);

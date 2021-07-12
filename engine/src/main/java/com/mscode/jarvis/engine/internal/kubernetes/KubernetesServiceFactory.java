@@ -5,6 +5,7 @@ import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Service;
 import com.mscode.jarvis.engine.api.ServiceFactory;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.MergedAnnotation;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.addEnv;
+import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.convertToJob;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.loadFromYaml;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.replacePorts;
 import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.mergeEnv;
@@ -40,6 +42,7 @@ public class KubernetesServiceFactory implements ServiceFactory {
 
         List<HasMetadata> resources = descriptor.getK8s().stream()
                 .flatMap(p -> loadFromYaml(client, properties.getBasePath().resolve(p)).stream())
+                .map(r -> properties.isConvertCronJobToJob() && r instanceof CronJob cj ? convertToJob(cj) : r)
                 .peek(r -> r.getMetadata().setNamespace(properties.getNamespace()))
                 .toList();
 

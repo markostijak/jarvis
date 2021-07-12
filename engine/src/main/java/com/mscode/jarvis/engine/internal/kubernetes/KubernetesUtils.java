@@ -6,7 +6,6 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
-import io.fabric8.kubernetes.api.model.PodTemplateSpec;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
@@ -17,6 +16,7 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 import io.fabric8.kubernetes.client.dsl.PrettyLoggable;
+import io.fabric8.kubernetes.client.internal.readiness.Readiness;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class KubernetesUtils {
@@ -87,26 +88,6 @@ public class KubernetesUtils {
         return null;
     }
 
-    public static PodTemplateSpec getPodTemplateSpec(HasMetadata metadata) {
-        if (metadata instanceof Job job) {
-            return job.getSpec().getTemplate();
-        }
-
-        if (metadata instanceof DaemonSet daemonSet) {
-            return daemonSet.getSpec().getTemplate();
-        }
-
-        if (metadata instanceof CronJob cronJob) {
-            return cronJob.getSpec().getJobTemplate().getSpec().getTemplate();
-        }
-
-        if (metadata instanceof Deployment deployment) {
-            return deployment.getSpec().getTemplate();
-        }
-
-        return null;
-    }
-
     public static ServiceSpec getServiceSpec(HasMetadata metadata) {
         if (metadata instanceof Service service) {
             return service.getSpec();
@@ -135,6 +116,27 @@ public class KubernetesUtils {
                 }
             }
         });
+    }
+
+    public static Job convertToJob(CronJob cronJob) {
+        return new Job(
+                cronJob.getApiVersion(),
+                "Job",
+                cronJob.getMetadata(),
+                cronJob.getSpec().getJobTemplate().getSpec(),
+                null
+        );
+    }
+
+    public static void waitUntilReadyOrCompleted(KubernetesClient client, List<HasMetadata> created, long amount, TimeUnit timeUnit) throws InterruptedException {
+        client.resourceList(created).waitUntilCondition(item -> {
+            if (item instanceof Job job) {
+                Integer succeeded = job.getStatus().getSucceeded();
+                return succeeded != null && succeeded == 1;
+            }
+
+            return Readiness.getInstance().isReady(item);
+        }, amount, timeUnit);
     }
 
 }

@@ -27,4 +27,9 @@ public class KubernetesProperties {
      *
      */
     private String namespace = "default";
+
+    /**
+     *
+     */
+    private boolean convertCronJobToJob = true;
 }
