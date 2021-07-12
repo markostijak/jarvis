@@ -23,12 +23,10 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 public class KubernetesUtils {
 
@@ -97,12 +95,18 @@ public class KubernetesUtils {
     }
 
     public static void addEnv(Container container, Map<String, String> env) {
-        List<EnvVar> additional = env.entrySet().stream()
-                .map(e -> new EnvVar(e.getKey(), e.getValue(), null))
-                .toList();
+        Map<String, String> joined = new HashMap<>();
 
-        List<EnvVar> envVars = Stream.of(container.getEnv(), additional)
-                .filter(Objects::nonNull).flatMap(Collection::stream)
+        if (container.getEnv() != null) {
+            container.getEnv().forEach(e -> joined.put(e.getName(), e.getValue()));
+        }
+
+        if (env != null) {
+            env.forEach(joined::put);
+        }
+
+        List<EnvVar> envVars = joined.entrySet().stream()
+                .map(e -> new EnvVar(e.getKey(), e.getValue(), null))
                 .toList();
 
         container.setEnv(envVars);

@@ -23,7 +23,7 @@ public class ExampleTest {
     private StringRedisTemplate redisTemplate;
 
     @Autowired
-    private KafkaTemplate<?, ?> kafkaTemplate;
+    private KafkaTemplate<Object, Object> kafkaTemplate;
 
     @Test
     public void test() {

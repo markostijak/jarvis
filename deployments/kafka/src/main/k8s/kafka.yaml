@@ -10,7 +10,6 @@ spec:
     - name: bootstrap-server
       port: 9092
       targetPort: 9092
-      nodePort: 32092
     - name: schema-registry
       port: 8081
       targetPort: 8081
@@ -52,10 +51,6 @@ spec:
               value: PLAINTEXT://kafka:9092
             - name: KAFKA_ZOOKEEPER_CONNECT
               value: kafka:2181
-            - name: ADV_HOST
-              value: kafka
-            - name: KAFKA_DELETE_TOPIC_ENABLE
-              value: "true"
           ports:
             - name: server
               containerPort: 9092
