@@ -30,4 +30,39 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <execution>
+                            <id>k8s-resources</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <encoding>UTF-8</encoding>
+                                <overwrite>true</overwrite>
+                                <resources>
+                                    <resource>
+                                        <filtering>true</filtering>
+                                        <directory>${project.basedir}/src/main/k8s</directory>
+                                        <includes>
+                                            <include>*.yaml</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                                <outputDirectory>${var}/k8s</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
 </project>

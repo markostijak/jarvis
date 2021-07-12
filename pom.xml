@@ -22,6 +22,8 @@
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
         <spring-boot.version>2.5.2</spring-boot.version>
+        <!--suppress UnresolvedMavenProperty -->
+        <var>${maven.multiModuleProjectDirectory}/var</var>
     </properties>
 
     <dependencyManagement>
@@ -43,6 +45,5 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
 
 </project>

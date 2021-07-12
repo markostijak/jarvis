@@ -6,7 +6,7 @@ jarvis:
   runner:
     kubernetes:
       context: 'test'
-      base-path: '${user.dir}/../k8s'
+      base-path: '${user.dir}/../var/k8s'
     docker-compose:
       context: 'test'
   services:

@@ -12,6 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>jarvis-deployment-kafka</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -29,5 +30,14 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
