@@ -5,9 +5,7 @@ import com.mscode.jarvis.engine.api.Service;
 import com.mscode.jarvis.engine.internal.utils.JarvisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.MergedAnnotations;
-import org.springframework.core.annotation.Order;
 import org.springframework.test.context.TestContext;
-import org.springframework.test.context.TestExecutionListener;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -24,8 +22,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-@Order(Integer.MIN_VALUE)
-public class JarvisServiceScheduler implements TestExecutionListener {
+public class JarvisServiceScheduler {
 
     private static final String SERVICES = JarvisServiceScheduler.class.getName() + ".services";
 
@@ -37,8 +34,7 @@ public class JarvisServiceScheduler implements TestExecutionListener {
         this.serviceFactory = serviceFactory;
     }
 
-    @Override
-    public void beforeTestClass(TestContext testContext) throws Exception {
+    public void beforeClass(TestContext testContext) throws Exception {
         Path outputDirectory = JarvisUtils.prepareDirectory(directory, testContext.getTestClass());
         List<Service> services = testContext.computeAttribute(SERVICES, s -> getServices(testContext));
         groupByOrder(services).map(group -> group.stream().map(service -> runAsync(() -> {
@@ -52,8 +48,7 @@ public class JarvisServiceScheduler implements TestExecutionListener {
         })).toArray(CompletableFuture[]::new)).forEach(array -> allOf(array).join());
     }
 
-    @Override
-    public void afterTestClass(TestContext testContext) {
+    public void afterClass(TestContext testContext) throws Exception {
         List<Service> services = testContext.computeAttribute(SERVICES, s -> emptyList());
         for (Service service : services) {
             log.info("Stopping {} service", service.getName());

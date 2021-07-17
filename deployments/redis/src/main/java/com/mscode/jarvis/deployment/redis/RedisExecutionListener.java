@@ -1,13 +1,17 @@
 package com.mscode.jarvis.deployment.redis;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 
-import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
+import static org.springframework.test.context.TestContextAnnotationUtils.findMergedAnnotation;
 
+
+@Slf4j
 @Component
 public class RedisExecutionListener implements TestExecutionListener {
 
@@ -19,10 +23,14 @@ public class RedisExecutionListener implements TestExecutionListener {
     }
 
     @Override
-    public void beforeTestMethod(TestContext testContext) throws Exception {
-        DeployRedis deployRedis = findAnnotation(testContext.getTestClass(), DeployRedis.class);
+    public void beforeTestMethod(TestContext testContext) {
+        DeployRedis deployRedis = findMergedAnnotation(testContext.getTestClass(), DeployRedis.class);
         if (deployRedis != null && deployRedis.flushAllBeforeTest()) {
-            // flush all
+            log.debug("Executing flushAll() on redis");
+            redisTemplate.execute((RedisCallback<?>) connection -> {
+                connection.flushAll();
+                return null;
+            });
         }
     }
 

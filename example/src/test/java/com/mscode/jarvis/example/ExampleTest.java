@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @JarvisTest
-@DeployRedis(order = 1)
+@DeployRedis(order = 1, flushAllBeforeTest = true)
 @DeployKafka(order = 1, delayed = 20)
 @DeployMySql(order = 1)
 public class ExampleTest {

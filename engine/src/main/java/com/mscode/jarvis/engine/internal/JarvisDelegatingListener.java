@@ -1,7 +1,6 @@
 package com.mscode.jarvis.engine.internal;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.TestContext;
@@ -15,7 +14,8 @@ public class JarvisDelegatingListener implements TestExecutionListener {
     private static final String LISTENERS = JarvisDelegatingListener.class.getName() + ".listeners";
 
     @Override
-    public void beforeTestClass(@NonNull TestContext testContext) {
+    public void beforeTestClass(@NonNull TestContext testContext) throws Exception {
+        getScheduler(testContext).beforeClass(testContext);
         forEachListener(testContext, l -> l.beforeTestClass(testContext));
     }
 
@@ -45,8 +45,9 @@ public class JarvisDelegatingListener implements TestExecutionListener {
     }
 
     @Override
-    public void afterTestClass(@NonNull TestContext testContext) {
+    public void afterTestClass(@NonNull TestContext testContext) throws Exception {
         forEachListener(testContext, l -> l.afterTestClass(testContext));
+        getScheduler(testContext).afterClass(testContext);
     }
 
     private void forEachListener(TestContext context, UncheckedConsumer<TestExecutionListener> consumer) {
@@ -61,11 +62,13 @@ public class JarvisDelegatingListener implements TestExecutionListener {
     }
 
     private List<TestExecutionListener> getOrderedListeners(TestContext context) {
-        return context.computeAttribute(LISTENERS, s -> {
-            ApplicationContext applicationContext = context.getApplicationContext();
-            return applicationContext.getBeansOfType(TestExecutionListener.class).values()
-                    .stream().sorted(AnnotationAwareOrderComparator.INSTANCE).toList();
-        });
+        return context.computeAttribute(LISTENERS, s -> context.getApplicationContext()
+                .getBeansOfType(TestExecutionListener.class).values().stream()
+                .sorted(AnnotationAwareOrderComparator.INSTANCE).toList());
+    }
+
+    private JarvisServiceScheduler getScheduler(TestContext context) {
+        return context.getApplicationContext().getBean(JarvisServiceScheduler.class);
     }
 
     interface UncheckedConsumer<T> {
