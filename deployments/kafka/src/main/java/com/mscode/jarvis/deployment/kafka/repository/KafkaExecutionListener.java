@@ -2,10 +2,8 @@ package com.mscode.jarvis.deployment.kafka.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 
@@ -17,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.springframework.test.context.TestContextAnnotationUtils.findMergedAnnotation;
 
 @Slf4j
-@Component
 public class KafkaExecutionListener implements TestExecutionListener {
 
     private final KafkaRepository kafkaRepository;
@@ -25,7 +22,6 @@ public class KafkaExecutionListener implements TestExecutionListener {
 
     private Map<String, Consumer<?, ?>> consumers;
 
-    @Autowired
     public KafkaExecutionListener(ConsumerFactory<?, ?> consumerFactory, KafkaRepository kafkaRepository) {
         this.consumerFactory = consumerFactory;
         this.kafkaRepository = kafkaRepository;
