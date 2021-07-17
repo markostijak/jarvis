@@ -26,8 +26,8 @@ public class RedisExecutionListener implements TestExecutionListener {
     public void beforeTestMethod(TestContext testContext) {
         DeployRedis deployRedis = findMergedAnnotation(testContext.getTestClass(), DeployRedis.class);
         if (deployRedis != null && deployRedis.flushAllBeforeTest()) {
-            log.debug("Executing flushAll() on redis");
             redisTemplate.execute((RedisCallback<?>) connection -> {
+                log.info("Executing flushAll() on redis");
                 connection.flushAll();
                 return null;
             });

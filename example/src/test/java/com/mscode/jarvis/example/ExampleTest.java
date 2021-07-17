@@ -1,33 +1,24 @@
 package com.mscode.jarvis.example;
 
 import com.mscode.jarvis.deployment.kafka.DeployKafka;
-import com.mscode.jarvis.deployment.mysql.DeployMySql;
-import com.mscode.jarvis.deployment.redis.DeployRedis;
+import com.mscode.jarvis.deployment.kafka.repository.EnableKafkaRepository;
+import com.mscode.jarvis.deployment.kafka.repository.KafkaRepository;
 import com.mscode.jarvis.engine.annotation.JarvisTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
 
 @JarvisTest
-@DeployRedis(order = 1, flushAllBeforeTest = true)
 @DeployKafka(order = 1, delayed = 20)
-@DeployMySql(order = 1)
+@EnableKafkaRepository(topics = "test")
 public class ExampleTest {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-
-    @Autowired
-    private KafkaTemplate<Object, Object> kafkaTemplate;
+    private KafkaRepository kafkaRepository;
 
     @Test
     public void test() {
-        System.out.println("test");
+        String test = kafkaRepository.getEvent("test");
+        System.out.println(test);
     }
 
 }

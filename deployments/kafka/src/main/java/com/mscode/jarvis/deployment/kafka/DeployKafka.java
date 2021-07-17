@@ -18,8 +18,4 @@ public @interface DeployKafka {
 
     int order() default 0;
 
-    String[] listen() default {};
-
-    int concurrency() default 5;
-
 }

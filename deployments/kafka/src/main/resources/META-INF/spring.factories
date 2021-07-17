@@ -1,3 +1,7 @@
 com.mscode.jarvis.deployment.kafka.DeployKafka=\
-com.mscode.jarvis.deployment.kafka.KafkaConfiguration,\
+com.mscode.jarvis.deployment.kafka.KafkaDeploymentConfiguration,\
 org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+com.mscode.jarvis.deployment.kafka.repository.EnableKafkaRepository=\
+com.mscode.jarvis.deployment.kafka.repository.KafkaRepository,\
+com.mscode.jarvis.deployment.kafka.repository.KafkaExecutionListener
