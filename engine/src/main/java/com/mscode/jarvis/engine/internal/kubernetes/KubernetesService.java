@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.listPods;
+import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.listNonTerminatingPods;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.logs;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.waitUntilReadyOrCompleted;
 import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.waitForDelay;
@@ -58,7 +58,7 @@ public class KubernetesService implements Service {
 
     @Override
     public void forwardLogsTo(Path directory) throws IOException {
-        for (Pod pod : listPods(client, created)) {
+        for (Pod pod : listNonTerminatingPods(client, created)) {
             for (Container container : pod.getSpec().getContainers()) {
                 String filename = pod.getMetadata().getName() + "." + container.getName() + ".log";
 

@@ -1,5 +1,6 @@
 package com.mscode.jarvis.runner;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherConfig;
@@ -9,16 +10,38 @@ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClasspathRoots;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
+import static org.springframework.util.StringUtils.hasText;
 
+@Slf4j
 public class JarvisRunner {
+
     public static void main(String[] args) {
-        DiscoverySelector selector = selectPackage(args[0]);
+        if (args.length != 0) {
+            run(requireNonNull(args[0], "Missing class or package"));
+        } else {
+            log.debug("Scanning classpath for test classes");
+            Set<Path> paths = Stream.of(System.getProperty("java.class.path").split(";"))
+                    .map(Path::of).collect(toSet());
+
+            run(selectClasspathRoots(paths).toArray(DiscoverySelector[]::new));
+        }
+    }
+
+    public static void run(DiscoverySelector... selectors) {
         SummaryGeneratingListener listener = new SummaryGeneratingListener();
 
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                .selectors(selector)
+                .selectors(selectors)
                 .build();
 
         LauncherConfig config = LauncherConfig.builder()
@@ -27,8 +50,26 @@ public class JarvisRunner {
 
         LauncherFactory.create(config).execute(request);
 
+        StringWriter out = new StringWriter();
+        StringWriter error = new StringWriter();
+
         TestExecutionSummary summary = listener.getSummary();
-        summary.printTo(new PrintWriter(System.out));
-        summary.printFailuresTo(new PrintWriter(System.err), 25);
+        summary.printTo(new PrintWriter(out));
+        summary.printFailuresTo(new PrintWriter(error), 25);
+
+        log.info("Test execution report\n" + out);
+        if (hasText(error.toString())) {
+            log.error("Test execution failures\n" + error);
+        }
     }
+
+    public static void run(String classOrPackage) {
+        boolean isClass = classOrPackage.chars().anyMatch(Character::isUpperCase);
+        run(isClass ? selectClass(classOrPackage) : selectPackage(classOrPackage));
+    }
+
+    public static void run(Class<?> clazz) {
+        run(selectClass(clazz));
+    }
+
 }

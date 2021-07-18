@@ -20,8 +20,8 @@ public class JarvisUtils {
     public static Path prepareDirectory(Path directory, Class<?> clazz) throws IOException {
         Path target = directory.resolve(clazz.getName());
 
-        if (Files.exists(directory)) {
-            FileSystemUtils.deleteRecursively(directory);
+        if (Files.exists(target)) {
+            FileSystemUtils.deleteRecursively(target);
         }
 
         return Files.createDirectories(target);

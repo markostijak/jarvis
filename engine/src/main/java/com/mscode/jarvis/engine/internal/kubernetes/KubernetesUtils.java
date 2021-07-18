@@ -1,6 +1,7 @@
 package com.mscode.jarvis.engine.internal.kubernetes;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
@@ -28,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static io.fabric8.kubernetes.client.utils.PodStatusUtil.isInitializing;
-import static io.fabric8.kubernetes.client.utils.PodStatusUtil.isRunning;
+import static io.fabric8.kubernetes.client.utils.PodStatusUtil.getContainerStatus;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toCollection;
 
 public class KubernetesUtils {
@@ -46,14 +47,19 @@ public class KubernetesUtils {
         return client.pods().inNamespace(namespace).withLabel("app", name).list().getItems();
     }
 
+    public static List<Pod> listNonTerminatingPods(KubernetesClient client, List<HasMetadata> resources) {
+        return listPods(client, resources).stream()
+                .filter(not(KubernetesUtils::isTerminated))
+                .toList();
+    }
+
     public static List<Pod> listPods(KubernetesClient client, List<HasMetadata> resources) {
         List<Pod> pods = new ArrayList<>();
 
         for (HasMetadata resource : resources) {
             if (hasPodSpec(resource)) {
                 ObjectMeta metadata = resource.getMetadata();
-                listPods(client, metadata.getNamespace(), metadata.getName()).stream()
-                        .filter(pod -> isInitializing(pod) || isRunning(pod)).collect(toCollection(() -> pods));
+                listPods(client, metadata.getNamespace(), metadata.getName()).stream().collect(toCollection(() -> pods));
             }
         }
 
@@ -146,6 +152,11 @@ public class KubernetesUtils {
 
             return Readiness.getInstance().isReady(item);
         }, amount, timeUnit);
+    }
+
+    public static boolean isTerminated(Pod pod) {
+        return getContainerStatus(pod).stream().map(ContainerStatus::getState)
+                .anyMatch(state -> state != null && state.getTerminated() != null);
     }
 
 }
