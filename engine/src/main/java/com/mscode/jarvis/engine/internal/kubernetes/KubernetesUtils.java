@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static io.fabric8.kubernetes.client.utils.PodStatusUtil.isInitializing;
+import static io.fabric8.kubernetes.client.utils.PodStatusUtil.isRunning;
+import static java.util.stream.Collectors.toCollection;
+
 public class KubernetesUtils {
 
     public static List<HasMetadata> loadFromYaml(KubernetesClient client, Path yaml) {
@@ -48,7 +52,8 @@ public class KubernetesUtils {
         for (HasMetadata resource : resources) {
             if (hasPodSpec(resource)) {
                 ObjectMeta metadata = resource.getMetadata();
-                pods.addAll(listPods(client, metadata.getNamespace(), metadata.getName()));
+                listPods(client, metadata.getNamespace(), metadata.getName()).stream()
+                        .filter(pod -> isInitializing(pod) || isRunning(pod)).collect(toCollection(() -> pods));
             }
         }
 

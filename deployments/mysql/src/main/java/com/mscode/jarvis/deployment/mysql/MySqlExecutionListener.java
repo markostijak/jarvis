@@ -26,7 +26,6 @@ public class MySqlExecutionListener implements TestExecutionListener {
     @Override
     public void beforeTestMethod(TestContext testContext) throws Exception {
         DeployMySql deployMySql = findMergedAnnotation(testContext.getTestClass(), DeployMySql.class);
-
         // create snapshot
     }
 

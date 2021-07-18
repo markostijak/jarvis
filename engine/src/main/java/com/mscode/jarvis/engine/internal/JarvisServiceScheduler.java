@@ -34,7 +34,7 @@ public class JarvisServiceScheduler {
         this.serviceFactory = serviceFactory;
     }
 
-    public void beforeClass(TestContext testContext) throws Exception {
+    public void beforeTestClass(TestContext testContext) throws Exception {
         Path outputDirectory = JarvisUtils.prepareDirectory(directory, testContext.getTestClass());
         List<Service> services = testContext.computeAttribute(SERVICES, s -> getServices(testContext));
         groupByOrder(services).map(group -> group.stream().map(service -> runAsync(() -> {
@@ -48,7 +48,7 @@ public class JarvisServiceScheduler {
         })).toArray(CompletableFuture[]::new)).forEach(array -> allOf(array).join());
     }
 
-    public void afterClass(TestContext testContext) throws Exception {
+    public void afterTestClass(TestContext testContext) throws Exception {
         List<Service> services = testContext.computeAttribute(SERVICES, s -> emptyList());
         for (Service service : services) {
             log.info("Stopping {} service", service.getName());

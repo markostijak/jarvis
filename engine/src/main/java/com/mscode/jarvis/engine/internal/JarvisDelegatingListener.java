@@ -15,7 +15,7 @@ public class JarvisDelegatingListener implements TestExecutionListener {
 
     @Override
     public void beforeTestClass(@NonNull TestContext testContext) throws Exception {
-        getScheduler(testContext).beforeClass(testContext);
+        getScheduler(testContext).beforeTestClass(testContext);
         forEachListener(testContext, l -> l.beforeTestClass(testContext));
     }
 
@@ -46,8 +46,11 @@ public class JarvisDelegatingListener implements TestExecutionListener {
 
     @Override
     public void afterTestClass(@NonNull TestContext testContext) throws Exception {
-        forEachListener(testContext, l -> l.afterTestClass(testContext));
-        getScheduler(testContext).afterClass(testContext);
+        try {
+            forEachListener(testContext, l -> l.afterTestClass(testContext));
+        } finally {
+            getScheduler(testContext).afterTestClass(testContext);
+        }
     }
 
     private void forEachListener(TestContext context, UncheckedConsumer<TestExecutionListener> consumer) {
