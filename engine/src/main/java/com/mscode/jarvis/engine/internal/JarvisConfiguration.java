@@ -8,8 +8,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import java.util.List;
 import java.util.Map;
@@ -52,16 +50,6 @@ public class JarvisConfiguration {
     @Autowired
     public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory factory) {
         return new JarvisServiceScheduler(factory, properties.getRunner().getLogsDirectory());
-    }
-
-    @Bean
-    public DependencyInjectionTestExecutionListener dependencyInjectionTestExecutionListener() {
-        return new DependencyInjectionTestExecutionListener();
-    }
-
-    @Bean
-    public DirtiesContextTestExecutionListener dirtiesContextTestExecutionListener() {
-        return new DirtiesContextTestExecutionListener();
     }
 
 }
