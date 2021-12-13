@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +29,11 @@ public class JarvisProperties {
 
     @Data
     public static class RunnerProperties {
+
+        /**
+         *
+         */
+        private Duration waitTimeout = Duration.ofMinutes(1);
 
         /**
          *

@@ -20,6 +20,7 @@ jarvis:
           - 'mysql.yaml'
         env:
           name: 'mysql'
+
     redis:
       connection:
         host: 'redis'
@@ -29,6 +30,7 @@ jarvis:
           - 'redis.yaml'
         env:
           name: 'redis'
+
     kafka:
       connection:
         bootstrap-servers: 'kafka:9092'
@@ -40,6 +42,11 @@ jarvis:
           - 'kafka.yaml'
         env:
           name: 'kafka'
+
+    mongo:
+      deployment:
+        helm:
+          chart: bitnami/mongodb
 
 ---
 spring:

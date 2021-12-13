@@ -5,8 +5,8 @@ import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Service;
 import com.mscode.jarvis.engine.api.ServiceFactory;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.Order;
@@ -14,22 +14,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
-import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.addEnv;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.convertToJob;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.loadFromYaml;
-import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.replacePorts;
+import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.override;
 import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.mergeEnv;
 import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.parsePorts;
+import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.parseVolumes;
 
+@Getter
 @Order(1)
 @Component
 public class KubernetesServiceFactory implements ServiceFactory {
 
-    private final KubernetesClient client;
-    private final KubernetesProperties properties;
+    protected final KubernetesClient client;
+    protected final KubernetesProperties properties;
 
     @Autowired
     public KubernetesServiceFactory(KubernetesClient client, KubernetesProperties properties) {
@@ -37,27 +36,33 @@ public class KubernetesServiceFactory implements ServiceFactory {
         this.properties = properties;
     }
 
+    @Override
     public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         String name = deployment.getString("name");
 
         List<HasMetadata> resources = descriptor.getK8s().stream()
                 .flatMap(p -> loadFromYaml(client, properties.getBasePath().resolve(p)).stream())
-                .map(r -> properties.isConvertCronJobToJob() && r instanceof CronJob cj ? convertToJob(cj) : r)
-                .peek(r -> r.getMetadata().setNamespace(properties.getNamespace()))
                 .toList();
 
         Assert.notEmpty(resources, "Missing resources for " + name + " deployment!");
 
-        Map<String, String> env = mergeEnv(descriptor, deployment);
-        resources.stream().map(KubernetesUtils::getPodSpec).filter(Objects::nonNull)
-                .flatMap(podSpec -> podSpec.getContainers().stream())
-                .forEach(container -> addEnv(container, env));
+        return create(resources, descriptor, deployment);
+    }
 
-        Map<Integer, Integer> ports = parsePorts(descriptor);
-        resources.stream().map(KubernetesUtils::getServiceSpec).filter(Objects::nonNull)
-                .forEach(serviceSpec -> replacePorts(serviceSpec, ports));
+    public Service create(List<HasMetadata> resources, DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
+        if (properties.isConvertCronJobToJob()) {
+            resources = convertToJob(resources);
+        }
 
-        return new KubernetesService(client, resources, deployment);
+        KubernetesOverride values = KubernetesOverride.builder()
+                .name(deployment.getString("name"))
+                .namespace(properties.getNamespace())
+                .env(mergeEnv(descriptor, deployment))
+                .volumes(parseVolumes(descriptor))
+                .ports(parsePorts(descriptor))
+                .build();
+
+        return new KubernetesService(client, override(resources, values), deployment);
     }
 
     @Override

@@ -47,6 +47,11 @@ public class JarvisUtils {
                 .collect(toMap(p -> Integer.parseInt(p[0]), p -> Integer.parseInt(p[1])));
     }
 
+    public static Map<String, String> parseVolumes(DeploymentDescriptor descriptor) {
+        return descriptor.getVolumes().stream().map(p -> p.split(":"))
+                .collect(toMap(p -> p[0], p -> p[1]));
+    }
+
     public static void waitForDelay(long delay, long amount, TimeUnit timeUnit) throws InterruptedException {
         TimeUnit.SECONDS.sleep(Math.min(timeUnit.toSeconds(amount), delay));
     }

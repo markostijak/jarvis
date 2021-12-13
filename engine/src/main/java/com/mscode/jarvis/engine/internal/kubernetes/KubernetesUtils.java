@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
+import io.fabric8.kubernetes.api.model.PodTemplateSpec;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
@@ -19,7 +20,9 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 import io.fabric8.kubernetes.client.dsl.PrettyLoggable;
 import io.fabric8.kubernetes.client.internal.readiness.Readiness;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,24 +30,42 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
+import java.util.function.Function;
 
+import static com.mscode.jarvis.engine.internal.JarvisProperties.JARVIS;
 import static io.fabric8.kubernetes.client.utils.PodStatusUtil.getContainerStatus;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toCollection;
 
 public class KubernetesUtils {
 
+    public static final String LABEL = JARVIS + ".deployment";
+
+    public static List<HasMetadata> load(KubernetesClient client, String s) {
+        return load(client, new ByteArrayInputStream(s.getBytes()));
+    }
+
+    public static List<HasMetadata> load(KubernetesClient client, InputStream is) {
+        return client.load(is).get();
+    }
+
     public static List<HasMetadata> loadFromYaml(KubernetesClient client, Path yaml) {
         try {
-            return client.load(Files.newInputStream(yaml)).get();
+            return load(client, Files.newInputStream(yaml));
         } catch (IOException e) {
             throw new UncheckedIOException("Unable to read file " + yaml, e);
         }
     }
 
     public static List<Pod> listPods(KubernetesClient client, String namespace, String name) {
-        return client.pods().inNamespace(namespace).withLabel("app", name).list().getItems();
+        return client.pods().inNamespace(namespace).withLabel(LABEL, name).list().getItems();
+    }
+
+    public static List<Pod> listNonTerminatingPods(KubernetesClient client, String namespace, String name) {
+        return listPods(client, namespace, name).stream()
+                .filter(not(KubernetesUtils::isTerminated))
+                .toList();
     }
 
     public static List<Pod> listNonTerminatingPods(KubernetesClient client, List<HasMetadata> resources) {
@@ -77,24 +98,38 @@ public class KubernetesUtils {
         return getPodSpec(metadata) != null;
     }
 
-    public static PodSpec getPodSpec(HasMetadata metadata) {
+    public static PodTemplateSpec getPodTemplateSpec(HasMetadata metadata) {
         if (metadata instanceof Job job) {
-            return job.getSpec().getTemplate().getSpec();
+            return job.getSpec().getTemplate();
         }
 
         if (metadata instanceof DaemonSet daemonSet) {
-            return daemonSet.getSpec().getTemplate().getSpec();
+            return daemonSet.getSpec().getTemplate();
         }
 
         if (metadata instanceof CronJob cronJob) {
-            return cronJob.getSpec().getJobTemplate().getSpec().getTemplate().getSpec();
+            return cronJob.getSpec().getJobTemplate().getSpec().getTemplate();
         }
 
         if (metadata instanceof Deployment deployment) {
-            return deployment.getSpec().getTemplate().getSpec();
+            return deployment.getSpec().getTemplate();
         }
 
         return null;
+    }
+
+    public static <T> T getPodData(HasMetadata metadata, Function<PodTemplateSpec, T> mapping) {
+        PodTemplateSpec templateSpec = getPodTemplateSpec(metadata);
+
+        if (templateSpec != null) {
+            return mapping.apply(templateSpec);
+        }
+
+        return null;
+    }
+
+    public static PodSpec getPodSpec(HasMetadata metadata) {
+        return getPodData(metadata, PodTemplateSpec::getSpec);
     }
 
     public static ServiceSpec getServiceSpec(HasMetadata metadata) {
@@ -113,7 +148,7 @@ public class KubernetesUtils {
         }
 
         if (env != null) {
-            env.forEach(joined::put);
+            joined.putAll(env);
         }
 
         List<EnvVar> envVars = joined.entrySet().stream()
@@ -121,6 +156,24 @@ public class KubernetesUtils {
                 .toList();
 
         container.setEnv(envVars);
+    }
+
+    public static void addLabels(PodTemplateSpec podTemplateSpec, Map<String, String> labels) {
+        Map<String, String> joined = new HashMap<>();
+        ObjectMeta meta = podTemplateSpec.getMetadata();
+
+        if (meta == null) {
+            meta = new ObjectMeta();
+        }
+
+        if (meta.getLabels() != null) {
+            joined.putAll(meta.getLabels());
+        }
+
+        joined.putAll(labels);
+
+        meta.setLabels(joined);
+        podTemplateSpec.setMetadata(meta);
     }
 
     public static void replacePorts(ServiceSpec serviceSpec, Map<Integer, Integer> ports) {
@@ -133,6 +186,18 @@ public class KubernetesUtils {
         });
     }
 
+    public static void replaceVolumes(Container container, Map<String, String> volumes) {
+        volumes.forEach((hosPath, containerPath) -> {
+
+        });
+    }
+
+    public static List<HasMetadata> convertToJob(List<HasMetadata> resources) {
+        return resources.stream()
+                .map(r -> r instanceof CronJob cj ? convertToJob(cj) : r)
+                .toList();
+    }
+
     public static Job convertToJob(CronJob cronJob) {
         return new Job(
                 cronJob.getApiVersion(),
@@ -143,20 +208,42 @@ public class KubernetesUtils {
         );
     }
 
-    public static void waitUntilReadyOrCompleted(KubernetesClient client, List<HasMetadata> created, long amount, TimeUnit timeUnit) throws InterruptedException {
-        client.resourceList(created).waitUntilCondition(item -> {
-            if (item instanceof Job job) {
-                Integer succeeded = job.getStatus().getSucceeded();
-                return succeeded != null && succeeded == 1;
-            }
+    public static boolean isReadyOrCompleted(HasMetadata item) {
+        if (item instanceof Job job) {
+            Integer succeeded = job.getStatus().getSucceeded();
+            return succeeded != null && succeeded == 1;
+        }
 
-            return Readiness.getInstance().isReady(item);
-        }, amount, timeUnit);
+        return Readiness.getInstance().isReady(item);
     }
 
     public static boolean isTerminated(Pod pod) {
         return getContainerStatus(pod).stream().map(ContainerStatus::getState)
                 .anyMatch(state -> state != null && state.getTerminated() != null);
+    }
+
+    public static List<HasMetadata> override(List<HasMetadata> resources, KubernetesOverride override) {
+        // namespace
+        resources.forEach(r -> r.getMetadata().setNamespace(override.getNamespace()));
+
+        // labels
+        Map<String, String> labels = Map.of(LABEL, override.getName());
+        resources.stream().map(KubernetesUtils::getPodTemplateSpec).filter(Objects::nonNull)
+                .forEach(podTemplateSpec -> addLabels(podTemplateSpec, labels));
+
+        // env and volumes
+        resources.stream().map(KubernetesUtils::getPodSpec).filter(Objects::nonNull)
+                .flatMap(podSpec -> podSpec.getContainers().stream())
+                .forEach(container -> {
+                    addEnv(container, override.getEnv());
+                    replaceVolumes(container, override.getVolumes());
+                });
+
+        // ports
+        resources.stream().map(KubernetesUtils::getServiceSpec).filter(Objects::nonNull)
+                .forEach(serviceSpec -> replacePorts(serviceSpec, override.getPorts()));
+
+        return resources;
     }
 
 }

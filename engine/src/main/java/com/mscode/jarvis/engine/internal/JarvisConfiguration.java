@@ -49,7 +49,7 @@ public class JarvisConfiguration {
     @Bean
     @Autowired
     public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory factory) {
-        return new JarvisServiceScheduler(factory, properties.getRunner().getLogsDirectory());
+        return new JarvisServiceScheduler(factory, properties.getRunner());
     }
 
 }

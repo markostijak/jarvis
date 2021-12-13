@@ -2,44 +2,43 @@ package com.mscode.jarvis.engine.internal.kubernetes;
 
 import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Await;
-import com.mscode.jarvis.engine.api.Service;
+import com.mscode.jarvis.engine.internal.service.BaseService;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 import org.springframework.core.annotation.MergedAnnotation;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.listNonTerminatingPods;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.logs;
-import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.waitUntilReadyOrCompleted;
 import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.waitForDelay;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
-public class KubernetesService implements Service {
+public class KubernetesService extends BaseService {
 
     private final KubernetesClient client;
     private final List<HasMetadata> resources;
-    private final MergedAnnotation<Deployment> annotation;
-    private final List<LogWatch> logWatches;
 
     private List<HasMetadata> created;
+    private List<LogWatch> logWatches;
 
     public KubernetesService(KubernetesClient client, List<HasMetadata> resources, MergedAnnotation<Deployment> annotation) {
+        super(annotation);
         this.client = client;
         this.resources = resources;
-        this.annotation = annotation;
-        this.logWatches = new ArrayList<>(3);
     }
 
     @Override
     public Await start() {
-        int delayed = annotation.getInt("delayed");
+        int delayed = getAnnotation().getInt("delayed");
 
         created = client.resourceList(resources).createOrReplace();
 
@@ -47,17 +46,24 @@ public class KubernetesService implements Service {
             return (amount, timeUnit) -> waitForDelay(delayed, amount, timeUnit);
         }
 
-        return (amount, timeUnit) -> waitUntilReadyOrCompleted(client, created, amount, timeUnit);
+        return (amount, timeUnit) -> client.resourceList(created)
+                .waitUntilCondition(KubernetesUtils::isReadyOrCompleted, amount, timeUnit);
     }
 
     @Override
     public boolean stop() {
-        logWatches.forEach(LogWatch::close);
+        if (!isEmpty(logWatches)) {
+            logWatches.forEach(LogWatch::close);
+        }
+
         return client.resourceList(created).delete();
     }
 
     @Override
     public void forwardLogsTo(Path directory) throws IOException {
+        Assert.notEmpty(created, "forwardLogsTo(Path) called before start()");
+
+        logWatches = new LinkedList<>();
         for (Pod pod : listNonTerminatingPods(client, created)) {
             for (Container container : pod.getSpec().getContainers()) {
                 String filename = pod.getMetadata().getName() + "." + container.getName() + ".log";
@@ -68,28 +74,6 @@ public class KubernetesService implements Service {
                 logWatches.add(logWatch);
             }
         }
-    }
-
-    @Override
-    public String getName() {
-        return annotation.getString("name");
-    }
-
-    @Override
-    public int getOrder() {
-        return annotation.getInt("order");
-    }
-
-    @Override
-    public MergedAnnotation<Deployment> getAnnotation() {
-        return annotation;
-    }
-
-    @Override
-    public String toString() {
-        return "KubernetesService{" +
-                "name=" + getName() +
-                '}';
     }
 
 }

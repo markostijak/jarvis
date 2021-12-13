@@ -1,5 +1,6 @@
 package com.mscode.jarvis.engine;
 
+import com.mscode.jarvis.engine.internal.helm.HelmChart;
 import lombok.Data;
 
 import java.nio.file.Path;
@@ -22,6 +23,11 @@ public class DeploymentDescriptor {
     /**
      *
      */
+    private HelmChart helm;
+
+    /**
+     *
+     */
     private String image;
 
     /**
@@ -33,6 +39,11 @@ public class DeploymentDescriptor {
      *
      */
     private Map<String, String> env = emptyMap();
+
+    /**
+     *
+     */
+    private List<String> volumes = emptyList();
 
     /**
      *
