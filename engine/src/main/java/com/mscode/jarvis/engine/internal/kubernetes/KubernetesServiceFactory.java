@@ -62,7 +62,9 @@ public class KubernetesServiceFactory implements ServiceFactory {
                 .ports(parsePorts(descriptor))
                 .build();
 
-        return new KubernetesService(client, override(resources, values), deployment);
+        List<HasMetadata> overridden = override(resources, values);
+
+        return new KubernetesService(client, overridden, deployment);
     }
 
     @Override

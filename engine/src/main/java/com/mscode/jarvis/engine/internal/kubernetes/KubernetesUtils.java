@@ -11,6 +11,7 @@ import io.fabric8.kubernetes.api.model.PodTemplateSpec;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
+import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.apps.DaemonSet;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
@@ -35,8 +36,10 @@ import java.util.function.Function;
 
 import static com.mscode.jarvis.engine.internal.JarvisProperties.JARVIS;
 import static io.fabric8.kubernetes.client.utils.PodStatusUtil.getContainerStatus;
+import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toCollection;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class KubernetesUtils {
 
@@ -186,10 +189,16 @@ public class KubernetesUtils {
         });
     }
 
-    public static void replaceVolumes(Container container, Map<String, String> volumes) {
-        volumes.forEach((hosPath, containerPath) -> {
+    public static void replaceVolumes(List<Volume> volumes, Container container, Map<String, String> paths) {
+        if (isEmpty(volumes) || isEmpty(container.getVolumeMounts())) {
+            return;
+        }
 
-        });
+        paths.forEach((hostPath, path) -> container.getVolumeMounts().stream()
+                .filter(vm -> vm.getMountPath().equals(path)).findFirst()
+                .flatMap(vm -> volumes.stream().filter(v -> v.getName().equals(vm.getName())).findFirst())
+                .filter(m -> nonNull(m.getHostPath()))
+                .ifPresent(volume -> volume.getHostPath().setPath(hostPath)));
     }
 
     public static List<HasMetadata> convertToJob(List<HasMetadata> resources) {
@@ -231,13 +240,15 @@ public class KubernetesUtils {
         resources.stream().map(KubernetesUtils::getPodTemplateSpec).filter(Objects::nonNull)
                 .forEach(podTemplateSpec -> addLabels(podTemplateSpec, labels));
 
-        // env and volumes
+        // env
         resources.stream().map(KubernetesUtils::getPodSpec).filter(Objects::nonNull)
                 .flatMap(podSpec -> podSpec.getContainers().stream())
-                .forEach(container -> {
-                    addEnv(container, override.getEnv());
-                    replaceVolumes(container, override.getVolumes());
-                });
+                .forEach(container -> addEnv(container, override.getEnv()));
+
+        // volumes
+        resources.stream().map(KubernetesUtils::getPodSpec).filter(Objects::nonNull)
+                .forEach(podSpec -> podSpec.getContainers()
+                        .forEach(c -> replaceVolumes(podSpec.getVolumes(), c, override.getVolumes())));
 
         // ports
         resources.stream().map(KubernetesUtils::getServiceSpec).filter(Objects::nonNull)
