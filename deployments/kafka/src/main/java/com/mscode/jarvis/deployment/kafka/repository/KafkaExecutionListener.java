@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Collections.emptyMap;
 import static org.springframework.test.context.TestContextAnnotationUtils.findMergedAnnotation;
 
 @Slf4j
@@ -20,7 +21,7 @@ public class KafkaExecutionListener implements TestExecutionListener {
     private final KafkaRepository kafkaRepository;
     private final ConsumerFactory<?, ?> consumerFactory;
 
-    private Map<String, Consumer<?, ?>> consumers;
+    private Map<String, Consumer<?, ?>> consumers = emptyMap();
 
     public KafkaExecutionListener(ConsumerFactory<?, ?> consumerFactory, KafkaRepository kafkaRepository) {
         this.consumerFactory = consumerFactory;
