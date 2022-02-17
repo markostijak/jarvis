@@ -19,9 +19,9 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
-        <spring-boot.version>2.5.2</spring-boot.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <spring-boot.version>2.6.3</spring-boot.version>
         <!--suppress UnresolvedMavenProperty -->
         <var>${maven.multiModuleProjectDirectory}/var</var>
     </properties>
