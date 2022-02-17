@@ -9,4 +9,6 @@ public class HelmChart {
 
     private String version;
 
+    private HelmRepository repository;
+
 }

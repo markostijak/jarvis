@@ -14,7 +14,7 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 
-import static com.mscode.jarvis.engine.internal.helm.Helm.version;
+import static com.mscode.jarvis.engine.internal.helm.HelmUtils.loadHelmChart;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.load;
 import static org.springframework.util.StringUtils.hasLength;
 
@@ -34,10 +34,8 @@ public class HelmServiceFactory implements ServiceFactory {
     @Override
     public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         String name = deployment.getString("name");
-        HelmChart helmChart = descriptor.getHelm();
 
-        HelmResult result = helm.template(name, helmChart.getChart(), version(helmChart.getVersion()));
-
+        HelmResult result = loadHelmChart(helm, name, descriptor.getHelm());
         Assert.isTrue(result.isSuccessful(), "Helm error: " + result.getError());
 
         List<HasMetadata> resources = load(factory.getClient(), result.getStdout());

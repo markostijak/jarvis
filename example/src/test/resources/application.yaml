@@ -47,6 +47,9 @@ jarvis:
       deployment:
         helm:
           chart: bitnami/mongodb
+          repository:
+            name: bitnami
+            url: https://charts.bitnami.com/bitnami
 
 ---
 spring:

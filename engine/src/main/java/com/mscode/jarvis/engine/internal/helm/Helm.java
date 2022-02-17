@@ -6,8 +6,6 @@ import org.springframework.util.StreamUtils;
 
 import java.nio.charset.Charset;
 
-import static org.springframework.util.StringUtils.hasText;
-
 @Slf4j
 @Component
 public class Helm {
@@ -22,6 +20,22 @@ public class Helm {
 
     public HelmResult delete(String... args) {
         return helm("delete", args);
+    }
+
+    public HelmResult repo(String command, String... args) {
+        return helm("repo " + command, args);
+    }
+
+    public HelmResult repoAdd(String name, String url) {
+        return repo("add", name, url);
+    }
+
+    public HelmResult repoList() {
+        return repo("list");
+    }
+
+    public HelmResult repoUpdate(String name) {
+        return repo("update", name);
     }
 
     private HelmResult helm(String command, String... args) {
@@ -44,16 +58,6 @@ public class Helm {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to execute command: " + String.join(" ", command), e);
         }
-    }
-
-    //----- static helper methods -----//
-
-    public static String version(String version) {
-        if (hasText(version)) {
-            return "--version " + version;
-        }
-
-        return "";
     }
 
 }
