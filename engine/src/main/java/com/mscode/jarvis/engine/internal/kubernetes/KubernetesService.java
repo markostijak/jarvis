@@ -2,7 +2,7 @@ package com.mscode.jarvis.engine.internal.kubernetes;
 
 import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Await;
-import com.mscode.jarvis.engine.internal.service.BaseService;
+import com.mscode.jarvis.engine.internal.JarvisService;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -22,7 +22,7 @@ import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.logs;
 import static com.mscode.jarvis.engine.internal.utils.JarvisUtils.waitForDelay;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-public class KubernetesService extends BaseService {
+public class KubernetesService extends JarvisService {
 
     private final KubernetesClient client;
     private final List<HasMetadata> resources;
