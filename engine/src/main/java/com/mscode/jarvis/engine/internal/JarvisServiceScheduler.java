@@ -14,6 +14,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 
+import static com.mscode.jarvis.engine.internal.JarvisExecutionEvent.ServiceEvent;
+import static com.mscode.jarvis.engine.internal.JarvisExecutionEvent.ServiceStarted;
+import static com.mscode.jarvis.engine.internal.JarvisExecutionEvent.ServiceStarting;
+import static com.mscode.jarvis.engine.internal.JarvisExecutionEvent.ServiceStopping;
 import static com.mscode.jarvis.engine.internal.JarvisProperties.RunnerProperties;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.allOf;
@@ -40,8 +44,12 @@ public class JarvisServiceScheduler {
         groupByOrder(services).map(group -> group.stream().map(service -> runAsync(() -> {
             try {
                 log.info("Starting {} service", service.getName());
+                publishEvent(testContext, new ServiceStarting(testContext, service));
+
                 service.start().waitUntilReady(properties.getWaitTimeout());
                 service.forwardLogsTo(outputDirectory);
+
+                publishEvent(testContext, new ServiceStarted(testContext, service));
             } catch (Exception e) {
                 throw new CompletionException("Service " + service.getName() + " readiness failed!", e);
             }
@@ -52,7 +60,11 @@ public class JarvisServiceScheduler {
         List<Service> services = testContext.computeAttribute(SERVICES, s -> emptyList());
         for (Service service : services) {
             log.info("Stopping {} service", service.getName());
+            publishEvent(testContext, new ServiceStopping(testContext, service));
+
             service.stop();
+
+            publishEvent(testContext, new ServiceStarting(testContext, service));
         }
     }
 
@@ -66,6 +78,10 @@ public class JarvisServiceScheduler {
         return services.stream()
                 .collect(groupingBy(Service::getOrder, TreeMap::new, toList()))
                 .values().stream();
+    }
+
+    private void publishEvent(TestContext context, ServiceEvent event) {
+        context.getApplicationContext().publishEvent(event);
     }
 
 }
