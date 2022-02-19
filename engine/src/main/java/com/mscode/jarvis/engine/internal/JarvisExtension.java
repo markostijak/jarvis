@@ -1,42 +1,32 @@
 package com.mscode.jarvis.engine.internal;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.lang.NonNull;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
+@Component
+public class JarvisExtension {
 
-public class JarvisExtension extends SpringExtension implements ExtensionContext.Store.CloseableResource {
+    private static final AtomicLong counter = new AtomicLong();
 
-    private static final String IDENTIFIER = JarvisExtension.class.getName();
-
-    private static final AtomicBoolean started = new AtomicBoolean();
-
-    @Override
-    public void beforeAll(@NonNull ExtensionContext context) throws Exception {
-        synchronized (IDENTIFIER) {
-            if (started.compareAndSet(false, true)) {
-                context.getStore(GLOBAL).put(IDENTIFIER, this);
-                ApplicationContext applicationContext = getApplicationContext(context);
-                publishEvent(applicationContext, new JarvisExecutionEvent.BeforeAll(applicationContext));
-            }
+    @EventListener
+    public void beforeAll(ContextRefreshedEvent event) {
+        ApplicationContext context = event.getApplicationContext();
+        if (context.getParent() == null && counter.getAndIncrement() == 0) {
+            context.publishEvent(new JarvisExecutionEvent.BeforeAll(context));
         }
-
-        super.beforeAll(context);
     }
 
-    @Override
-    public void close() {
-        ApplicationContext applicationContext = getApplicationContext(null /*extensionContext*/);
-        publishEvent(applicationContext, new JarvisExecutionEvent.AfterAll(applicationContext));
-    }
-
-    private void publishEvent(ApplicationContext applicationContext, ApplicationEvent event) {
-        applicationContext.publishEvent(event);
+    @EventListener
+    public void afterAll(ContextClosedEvent event) {
+        ApplicationContext context = event.getApplicationContext();
+        if (context.getParent() == null && counter.decrementAndGet() == 0) {
+            context.publishEvent(new JarvisExecutionEvent.AfterAll(context));
+        }
     }
 
 }

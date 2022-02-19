@@ -2,7 +2,6 @@ package com.mscode.jarvis.engine.annotation;
 
 import com.mscode.jarvis.engine.internal.JarvisConfiguration;
 import com.mscode.jarvis.engine.internal.JarvisDelegatingListener;
-import com.mscode.jarvis.engine.internal.JarvisExtension;
 import com.mscode.jarvis.engine.internal.JarvisTestContextBootstrapper;
 import com.mscode.jarvis.engine.internal.JarvisTestContextBootstrapper.JarvisContextLoader;
 import com.mscode.jarvis.engine.test.JarvisTestConfiguration;
@@ -11,6 +10,7 @@ import org.springframework.test.context.BootstrapWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.lang.annotation.Documented;
@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(JarvisExtension.class)
+@ExtendWith(SpringExtension.class)
 @BootstrapWith(JarvisTestContextBootstrapper.class)
 @TestExecutionListeners(listeners = JarvisDelegatingListener.class)
 @ContextHierarchy({
