@@ -2,6 +2,7 @@ package com.mscode.jarvis.deployment.kafka.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.springframework.core.Ordered;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.TestContext;
@@ -16,7 +17,7 @@ import static java.util.Collections.emptyMap;
 import static org.springframework.test.context.TestContextAnnotationUtils.findMergedAnnotation;
 
 @Slf4j
-public class KafkaExecutionListener implements TestExecutionListener {
+public class KafkaExecutionListener implements TestExecutionListener, Ordered {
 
     private final KafkaRepository kafkaRepository;
     private final ConsumerFactory<?, ?> consumerFactory;
@@ -57,6 +58,11 @@ public class KafkaExecutionListener implements TestExecutionListener {
             consumer.close();
             log.info("Closed KafkaConsumer for {} topic", topic);
         });
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 
 }

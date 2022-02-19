@@ -52,4 +52,15 @@ public class JarvisTestContextBootstrapper extends DefaultTestContextBootstrappe
         }
     }
 
+    public static class JarvisTestContextLoader extends AnnotationConfigContextLoader {
+        @Override
+        protected void prepareContext(@NonNull GenericApplicationContext context) {
+            context.addBeanFactoryPostProcessor(beanFactory -> {
+                for (String beanName : beanFactory.getBeanDefinitionNames()) {
+                    beanFactory.getBeanDefinition(beanName).setLazyInit(true);
+                }
+            });
+        }
+    }
+
 }

@@ -11,13 +11,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static com.mscode.jarvis.engine.internal.JarvisTestContextBootstrapper.JarvisTestContextLoader;
 
 @Documented
 @Target(ElementType.TYPE)
@@ -27,7 +28,7 @@ import java.lang.annotation.Target;
 @TestExecutionListeners(listeners = JarvisDelegatingListener.class)
 @ContextHierarchy({
         @ContextConfiguration(classes = JarvisConfiguration.class, loader = JarvisContextLoader.class),
-        @ContextConfiguration(classes = JarvisTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
+        @ContextConfiguration(classes = JarvisTestConfiguration.class, loader = JarvisTestContextLoader.class)
 })
 public @interface JarvisTest {
 }

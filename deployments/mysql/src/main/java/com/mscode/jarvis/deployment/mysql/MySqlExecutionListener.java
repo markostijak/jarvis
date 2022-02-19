@@ -1,6 +1,7 @@
 package com.mscode.jarvis.deployment.mysql;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestContext;
@@ -9,7 +10,7 @@ import org.springframework.test.context.TestExecutionListener;
 import static org.springframework.test.context.TestContextAnnotationUtils.findMergedAnnotation;
 
 @Component
-public class MySqlExecutionListener implements TestExecutionListener {
+public class MySqlExecutionListener implements TestExecutionListener, Ordered {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -38,6 +39,11 @@ public class MySqlExecutionListener implements TestExecutionListener {
     @Override
     public void afterTestClass(TestContext testContext) throws Exception {
 
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 
 }

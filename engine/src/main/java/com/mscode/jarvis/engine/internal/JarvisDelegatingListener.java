@@ -12,6 +12,7 @@ import java.util.List;
 public class JarvisDelegatingListener implements TestExecutionListener {
 
     private static final String LISTENERS = JarvisDelegatingListener.class.getName() + ".listeners";
+    private static final String SCHEDULER = JarvisDelegatingListener.class.getName() + ".scheduler";
 
     @Override
     public void beforeTestClass(@NonNull TestContext testContext) throws Exception {
@@ -71,7 +72,8 @@ public class JarvisDelegatingListener implements TestExecutionListener {
     }
 
     private JarvisServiceScheduler getScheduler(TestContext context) {
-        return context.getApplicationContext().getBean(JarvisServiceScheduler.class);
+        return context.computeAttribute(SCHEDULER, s -> context.getApplicationContext()
+                .getBean(JarvisServiceScheduler.class));
     }
 
     interface UncheckedConsumer<T> {

@@ -2,6 +2,7 @@ package com.mscode.jarvis.deployment.redis;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ import static org.springframework.test.context.TestContextAnnotationUtils.findMe
 
 @Slf4j
 @Component
-public class RedisExecutionListener implements TestExecutionListener {
+public class RedisExecutionListener implements TestExecutionListener, Ordered {
 
     private final RedisTemplate<Object, Object> redisTemplate;
 
@@ -32,6 +33,11 @@ public class RedisExecutionListener implements TestExecutionListener {
                 return null;
             });
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 
 }
