@@ -4,7 +4,10 @@ import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.Namespace;
+import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
@@ -255,6 +258,23 @@ public class KubernetesUtils {
                 .forEach(serviceSpec -> replacePorts(serviceSpec, override.getPorts()));
 
         return resources;
+    }
+
+    public static Namespace createNamespace(String name, Map<String, String> labels) {
+        ObjectMeta meta = new ObjectMetaBuilder()
+                .withName(name)
+                .withLabels(labels)
+                .build();
+
+        return new NamespaceBuilder().withMetadata(meta).build();
+    }
+
+    public static List<Namespace> listNamespaces(KubernetesClient client) {
+        return client.namespaces().list().getItems();
+    }
+
+    public static boolean namespaceExists(KubernetesClient client, String name) {
+        return listNamespaces(client).stream().anyMatch(n -> n.getMetadata().getName().equals(name));
     }
 
 }

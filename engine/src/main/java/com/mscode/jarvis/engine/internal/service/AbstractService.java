@@ -1,14 +1,14 @@
-package com.mscode.jarvis.engine.internal;
+package com.mscode.jarvis.engine.internal.service;
 
 import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Service;
 import org.springframework.core.annotation.MergedAnnotation;
 
-public abstract class JarvisService implements Service {
+public abstract class AbstractService implements Service {
 
     private final MergedAnnotation<Deployment> annotation;
 
-    public JarvisService(MergedAnnotation<Deployment> annotation) {
+    public AbstractService(MergedAnnotation<Deployment> annotation) {
         this.annotation = annotation;
     }
 

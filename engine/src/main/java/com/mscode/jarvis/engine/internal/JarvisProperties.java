@@ -38,6 +38,11 @@ public class JarvisProperties {
         /**
          *
          */
+        private boolean parallelExecution = true;
+
+        /**
+         *
+         */
         private Path logsDirectory = Path.of(System.getProperty("user.dir")).resolve("target").resolve("jarvis");
 
     }

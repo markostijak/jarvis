@@ -46,10 +46,10 @@ jarvis:
     mongo:
       deployment:
         helm:
-          chart: bitnami/mongodb
+          chart: 'bitnami/mongodb'
           repository:
-            name: bitnami
-            url: https://charts.bitnami.com/bitnami
+            name: 'bitnami'
+            url: 'https://charts.bitnami.com/bitnami'
 
 ---
 spring:
@@ -74,7 +74,7 @@ jarvis:
           - '32379:6379'
     kafka:
       connection:
-        bootstrap-servers: 'localhost:32092'
+        bootstrap-servers: 'localhost.${NAMESPACE}:32092'
         consumer:
           group-id: 'jarvis-dev'
       deployment:
@@ -82,3 +82,24 @@ jarvis:
           - '32092:9093'
         env:
           KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:32092
+
+---
+spring:
+  config:
+    activate:
+      on-profile: parallel-execution
+
+jarvis:
+  services:
+    mysql:
+      connection:
+        url: 'jdbc:mysql://mysql.${NAMESPACE}:3306/test'
+    redis:
+      connection:
+        host: 'redis.${NAMESPACE}'
+        port: 6379
+    kafka:
+      connection:
+        bootstrap-servers: 'kafka.${NAMESPACE}:9092'
+        consumer:
+          group-id: 'jarvis-dev'
