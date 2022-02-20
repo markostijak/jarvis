@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestContext;
 
 @Order(3)
-@Component
+//@Component
 public class DockerServiceFactory implements ServiceFactory {
 
     private final DockerProperties properties;
