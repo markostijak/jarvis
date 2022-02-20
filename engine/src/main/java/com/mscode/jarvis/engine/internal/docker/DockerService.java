@@ -2,12 +2,12 @@ package com.mscode.jarvis.engine.internal.docker;
 
 import com.mscode.jarvis.engine.annotation.Deployment;
 import com.mscode.jarvis.engine.api.Await;
-import com.mscode.jarvis.engine.internal.JarvisService;
+import com.mscode.jarvis.engine.internal.service.AbstractService;
 import org.springframework.core.annotation.MergedAnnotation;
 
 import java.nio.file.Path;
 
-public class DockerService extends JarvisService {
+public class DockerService extends AbstractService {
 
     public DockerService(MergedAnnotation<Deployment> annotation) {
         super(annotation);
