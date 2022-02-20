@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.TestContext;
 
 @Order(3)
 @Component
@@ -21,7 +22,7 @@ public class DockerServiceFactory implements ServiceFactory {
     }
 
     @Override
-    public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
+    public Service create(TestContext context, DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         return null;
     }
 

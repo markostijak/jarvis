@@ -6,6 +6,7 @@ import com.mscode.jarvis.engine.api.Service;
 import com.mscode.jarvis.engine.api.ServiceFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.MergedAnnotation;
+import org.springframework.test.context.TestContext;
 
 import java.util.List;
 
@@ -20,13 +21,13 @@ public class JarvisServiceFactory {
         this.factories = factories;
     }
 
-    public Service create(MergedAnnotation<Deployment> deployment) {
+    public Service create(TestContext context, MergedAnnotation<Deployment> deployment) {
         String name = deployment.getString("name");
         DeploymentDescriptor descriptor = repository.getByName(name);
 
         for (ServiceFactory factory : factories) {
             if (factory.supports(descriptor)) {
-                return factory.create(descriptor, deployment);
+                return factory.create(context, descriptor, deployment);
             }
         }
 

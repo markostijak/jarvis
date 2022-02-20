@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.TestContext;
 import org.springframework.util.Assert;
 
 import java.util.List;
 
+import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesServiceScheduler.NAMESPACE_NAME;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.convertToJob;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.loadFromYaml;
 import static com.mscode.jarvis.engine.internal.kubernetes.KubernetesUtils.override;
@@ -37,7 +39,7 @@ public class KubernetesServiceFactory implements ServiceFactory {
     }
 
     @Override
-    public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
+    public Service create(TestContext context, DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         String name = deployment.getString("name");
 
         List<HasMetadata> resources = descriptor.getK8s().stream()
@@ -46,20 +48,24 @@ public class KubernetesServiceFactory implements ServiceFactory {
 
         Assert.notEmpty(resources, "Missing resources for " + name + " deployment!");
 
-        return create(resources, descriptor, deployment);
+        return create(context, resources, descriptor, deployment);
     }
 
-    public Service create(List<HasMetadata> resources, DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
+    public Service create(TestContext context, List<HasMetadata> resources, DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         if (properties.isConvertCronJobToJob()) {
             resources = convertToJob(resources);
         }
 
+        String namespace = context.computeAttribute(NAMESPACE_NAME,
+                n -> properties.getNamespace()
+        );
+
         KubernetesOverride values = KubernetesOverride.builder()
                 .name(deployment.getString("name"))
-                .namespace(properties.getNamespace())
                 .env(mergeEnv(descriptor, deployment))
                 .volumes(parseVolumes(descriptor))
                 .ports(parsePorts(descriptor))
+                .namespace(namespace)
                 .build();
 
         List<HasMetadata> overridden = override(resources, values);

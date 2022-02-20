@@ -82,3 +82,28 @@ jarvis:
           - '32092:9093'
         env:
           KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:32092
+
+---
+spring:
+  config:
+    activate:
+      on-profile: parallel
+
+jarvis:
+  runner:
+    kubernetes:
+      namespace: jarvis
+  services:
+    mysql:
+      connection:
+        url: 'jdbc:mysql://mysql.${jarvis.kubernetes.namespace.suffix}:32306/test'
+    redis:
+      connection:
+        host: 'redis.${jarvis.kubernetes.namespace.suffix}'
+        port: 32379
+    kafka:
+      connection:
+        bootstrap-servers: 'kafka.${jarvis.kubernetes.namespace.suffix}:32092'
+      deployment:
+        env:
+          KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9092,EXTERNAL://kafka.${jarvis.kubernetes.namespace.suffix}:32092'

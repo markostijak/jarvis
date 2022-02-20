@@ -1,6 +1,7 @@
 package com.mscode.jarvis.engine.internal;
 
 import com.mscode.jarvis.engine.api.ServiceFactory;
+import com.mscode.jarvis.engine.api.ServiceScheduler;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +49,8 @@ public class JarvisConfiguration {
 
     @Bean
     @Autowired
-    public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory factory) {
-        return new JarvisServiceScheduler(factory, properties.getRunner());
+    public JarvisServiceScheduler jarvisServiceScheduler(JarvisServiceFactory factory, ServiceScheduler serviceScheduler) {
+        return new JarvisServiceScheduler(properties.getRunner(), factory, serviceScheduler);
     }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.TestContext;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class HelmServiceFactory implements ServiceFactory {
     }
 
     @Override
-    public Service create(DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
+    public Service create(TestContext context, DeploymentDescriptor descriptor, MergedAnnotation<Deployment> deployment) {
         String name = deployment.getString("name");
 
         HelmResult result = loadHelmChart(helm, name, descriptor.getHelm());
@@ -40,7 +41,7 @@ public class HelmServiceFactory implements ServiceFactory {
 
         List<HasMetadata> resources = load(factory.getClient(), result.getStdout());
 
-        return factory.create(resources, descriptor, deployment);
+        return factory.create(context, resources, descriptor, deployment);
     }
 
     @Override
