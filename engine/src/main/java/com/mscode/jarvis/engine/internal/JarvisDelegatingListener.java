@@ -16,7 +16,7 @@ public class JarvisDelegatingListener implements TestExecutionListener {
 
     @Override
     public void beforeTestClass(@NonNull TestContext testContext) throws Exception {
-        getScheduler(testContext).beforeTestClass(testContext);
+        getServiceScheduler(testContext).beforeTestClass(testContext);
         forEachListener(testContext, l -> l.beforeTestClass(testContext));
     }
 
@@ -50,7 +50,7 @@ public class JarvisDelegatingListener implements TestExecutionListener {
         try {
             forEachListener(testContext, l -> l.afterTestClass(testContext));
         } finally {
-            getScheduler(testContext).afterTestClass(testContext);
+            getServiceScheduler(testContext).afterTestClass(testContext);
         }
     }
 
@@ -71,7 +71,7 @@ public class JarvisDelegatingListener implements TestExecutionListener {
                 .sorted(AnnotationAwareOrderComparator.INSTANCE).toList());
     }
 
-    private JarvisServiceScheduler getScheduler(TestContext context) {
+    private JarvisServiceScheduler getServiceScheduler(TestContext context) {
         return context.computeAttribute(SCHEDULER, s -> context.getApplicationContext()
                 .getBean(JarvisServiceScheduler.class));
     }
