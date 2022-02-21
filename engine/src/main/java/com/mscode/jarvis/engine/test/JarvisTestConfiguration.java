@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 @Configuration
+@EnableAutoConfiguration
 public class JarvisTestConfiguration {
 
     @Bean
