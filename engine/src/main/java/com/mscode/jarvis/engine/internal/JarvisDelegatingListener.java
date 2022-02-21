@@ -1,5 +1,6 @@
 package com.mscode.jarvis.engine.internal;
 
+import com.mscode.jarvis.engine.internal.utils.UncheckedConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.NonNull;
@@ -74,10 +75,6 @@ public class JarvisDelegatingListener implements TestExecutionListener {
     private JarvisServiceScheduler getServiceScheduler(TestContext context) {
         return context.computeAttribute(SCHEDULER, s -> context.getApplicationContext()
                 .getBean(JarvisServiceScheduler.class));
-    }
-
-    interface UncheckedConsumer<T> {
-        void accept(T t) throws Exception;
     }
 
 }

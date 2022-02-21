@@ -1,5 +1,6 @@
 package com.mscode.jarvis.engine.internal;
 
+import com.mscode.jarvis.engine.api.ExecutionListener;
 import com.mscode.jarvis.engine.api.ServiceFactory;
 import com.mscode.jarvis.engine.api.ServiceScheduler;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -14,10 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
+import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 
-@ComponentScan
 @Configuration
 @EnableConfigurationProperties(JarvisProperties.class)
+@ComponentScan(includeFilters = @ComponentScan.Filter(classes = ExecutionListener.class, type = ASSIGNABLE_TYPE))
 public class JarvisConfiguration {
 
     private final JarvisProperties properties;
