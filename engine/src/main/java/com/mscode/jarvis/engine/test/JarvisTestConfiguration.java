@@ -1,8 +1,8 @@
 package com.mscode.jarvis.engine.test;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.event.EventPublishingTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 @Configuration
@@ -17,6 +17,11 @@ public class JarvisTestConfiguration {
     @Bean
     public JarvisDirtiesContextTestExecutionListener jarvisDirtiesContextTestExecutionListener() {
         return new JarvisDirtiesContextTestExecutionListener();
+    }
+
+    @Bean
+    public EventPublishingTestExecutionListener eventPublishingTestExecutionListener() {
+        return new EventPublishingTestExecutionListener();
     }
 
 }

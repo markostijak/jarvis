@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 @JarvisTest
-@Deploy(value = "mongo", order = 1)
+@Deploy(name = "mongo", order = 1)
 @DeployMySql(order = 1)
 @DeployKafka(order = 1, delayed = 20)
 @DeployRedis(order = 1, flushAllBeforeTest = true)
