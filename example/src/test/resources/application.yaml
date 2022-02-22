@@ -7,6 +7,7 @@ jarvis:
     kubernetes:
       context: 'test'
       base-path: '${user.dir}/../var/k8s'
+      namespace: jarvis
     docker-compose:
       context: 'test'
   services:
