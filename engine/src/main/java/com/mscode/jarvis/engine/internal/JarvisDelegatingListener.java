@@ -13,7 +13,6 @@ import java.util.List;
 public class JarvisDelegatingListener implements TestExecutionListener {
 
     private static final String LISTENERS = JarvisDelegatingListener.class.getName() + ".listeners";
-    private static final String SCHEDULER = JarvisDelegatingListener.class.getName() + ".scheduler";
 
     @Override
     public void beforeTestClass(@NonNull TestContext testContext) throws Exception {
@@ -60,8 +59,7 @@ public class JarvisDelegatingListener implements TestExecutionListener {
             try {
                 consumer.accept(listener);
             } catch (Exception e) {
-                log.error("Exception occurred while executing {}", listener.getClass().getSimpleName(), e);
-                throw new IllegalStateException(e);
+                throw new JarvisExecutionException(listener.getClass().getName() + " threw exception", e);
             }
         }
     }
@@ -73,8 +71,8 @@ public class JarvisDelegatingListener implements TestExecutionListener {
     }
 
     private JarvisServiceScheduler getServiceScheduler(TestContext context) {
-        return context.computeAttribute(SCHEDULER, s -> context.getApplicationContext()
-                .getBean(JarvisServiceScheduler.class));
+        return context.computeAttribute(JarvisServiceScheduler.class.getName(),
+                s -> context.getApplicationContext().getBean(JarvisServiceScheduler.class));
     }
 
 }

@@ -6,7 +6,7 @@ import org.springframework.test.context.event.EventPublishingTestExecutionListen
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 @Configuration
-@EnableAutoConfiguration
+@ImportTestComponents
 public class JarvisTestConfiguration {
 
     @Bean

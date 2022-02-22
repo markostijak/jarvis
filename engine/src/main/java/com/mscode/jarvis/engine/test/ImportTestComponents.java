@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 @ImportAutoConfiguration
-public @interface EnableAutoConfiguration {
+public @interface ImportTestComponents {
 }

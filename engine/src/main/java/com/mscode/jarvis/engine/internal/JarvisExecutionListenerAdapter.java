@@ -44,8 +44,7 @@ public class JarvisExecutionListenerAdapter {
             try {
                 consumer.accept(listener);
             } catch (Exception e) {
-                log.error("Exception occurred while executing {}", listener.getClass().getSimpleName(), e);
-                throw new IllegalStateException(e);
+                throw new JarvisExecutionException(listener.getClass().getName() + " threw exception", e);
             }
         }
     }
