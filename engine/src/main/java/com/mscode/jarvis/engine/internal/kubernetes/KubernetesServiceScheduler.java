@@ -89,8 +89,10 @@ public class KubernetesServiceScheduler implements ServiceScheduler {
     @Override
     public void stopServices(Stream<List<Service>> services, ExecutionDescriptor descriptor) {
         services.flatMap(Collection::stream).forEach(service -> {
-            log.info("Stopping {} service", service.getName());
-            service.stop();
+            if (service.isDeployed()) {
+                log.info("Stopping {} service", service.getName());
+                service.stop();
+            }
         });
     }
 

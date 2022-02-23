@@ -42,7 +42,6 @@ public class ExampleTest {
 
         final String test1 = redisTemplate.opsForValue().get("test");
         System.out.println(test1);
-
     }
 
 }

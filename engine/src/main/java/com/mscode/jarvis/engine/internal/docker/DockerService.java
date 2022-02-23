@@ -28,4 +28,9 @@ public class DockerService extends AbstractService {
 
     }
 
+    @Override
+    public boolean isDeployed() {
+        return false;
+    }
+
 }

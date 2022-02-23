@@ -76,4 +76,9 @@ public class KubernetesService extends AbstractService {
         }
     }
 
+    @Override
+    public boolean isDeployed() {
+        return !isEmpty(created);
+    }
+
 }

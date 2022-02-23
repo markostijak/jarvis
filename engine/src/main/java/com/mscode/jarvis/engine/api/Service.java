@@ -21,4 +21,6 @@ public interface Service {
 
     MergedAnnotation<Deployment> getAnnotation();
 
+    boolean isDeployed();
+
 }
