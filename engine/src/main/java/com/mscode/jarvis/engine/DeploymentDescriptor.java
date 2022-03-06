@@ -3,7 +3,6 @@ package com.mscode.jarvis.engine;
 import com.mscode.jarvis.engine.internal.helm.HelmChart;
 import lombok.Data;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public class DeploymentDescriptor {
     /**
      *
      */
-    private List<Path> k8s = emptyList();
+    private List<String> k8s = emptyList();
 
     /**
      *
