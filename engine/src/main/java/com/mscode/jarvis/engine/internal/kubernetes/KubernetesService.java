@@ -64,7 +64,7 @@ public class KubernetesService extends AbstractService {
         Assert.notEmpty(created, "forwardLogsTo(Path) called before start()");
 
         logWatches = new LinkedList<>();
-        for (Pod pod : listNonTerminatingPods(client, created)) {
+        for (Pod pod : listNonTerminatingPods(client, created, getName())) {
             for (Container container : pod.getSpec().getContainers()) {
                 String filename = pod.getMetadata().getName() + "." + container.getName() + ".log";
 

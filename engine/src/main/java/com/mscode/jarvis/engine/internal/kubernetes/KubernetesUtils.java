@@ -74,19 +74,19 @@ public class KubernetesUtils {
                 .toList();
     }
 
-    public static List<Pod> listNonTerminatingPods(KubernetesClient client, List<HasMetadata> resources) {
-        return listPods(client, resources).stream()
+    public static List<Pod> listNonTerminatingPods(KubernetesClient client, List<HasMetadata> resources, String name) {
+        return listPods(client, resources, name).stream()
                 .filter(not(KubernetesUtils::isTerminated))
                 .toList();
     }
 
-    public static List<Pod> listPods(KubernetesClient client, List<HasMetadata> resources) {
+    public static List<Pod> listPods(KubernetesClient client, List<HasMetadata> resources, String name) {
         List<Pod> pods = new ArrayList<>();
 
         for (HasMetadata resource : resources) {
             if (hasPodSpec(resource)) {
                 ObjectMeta metadata = resource.getMetadata();
-                listPods(client, metadata.getNamespace(), metadata.getName()).stream().collect(toCollection(() -> pods));
+                listPods(client, metadata.getNamespace(), name).stream().collect(toCollection(() -> pods));
             }
         }
 
