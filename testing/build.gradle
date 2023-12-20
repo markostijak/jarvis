@@ -1,0 +1,17 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    testImplementation project(':modules:engine')
+    testImplementation project(':modules:deployment:core')
+    testImplementation project(':modules:deployment:docker')
+
+    testImplementation project(':services:kafka')
+    testImplementation project(':services:postgres')
+    testImplementation project(':services:wiremock')
+
+    testImplementation group: "org.wiremock", name: "wiremock", version: "3.2.0"
+}
+
+group = 'com.github.markostijak.jarvis.testing'
+
+publishMavenPublicationToMavenLocal.onlyIf { false }

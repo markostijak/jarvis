@@ -1,0 +1,8 @@
+org.springframework.test.context.ContextCustomizerFactory=\
+  com.github.markostijak.jarvis.engine.internal.JarvisContextCustomizerFactory
+
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.github.markostijak.jarvis.engine.internal.JarvisEnvironmentPostProcessor
+
+org.springframework.test.context.TestExecutionListener=\
+  com.github.markostijak.jarvis.engine.internal.JarvisDelegatingListener

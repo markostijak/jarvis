@@ -1,0 +1,81 @@
+spring:
+  profiles:
+    active: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+jarvis:
+  deployment:
+    docker:
+      services:
+        kafka:
+          descriptor:
+            ports:
+              - 9092:9092
+            env:
+              KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9092,EXTERNAL://localhost:9092'
+          connection-details:
+            bootstrap-servers:
+              - localhost:9092
+            producer:
+              value-serializer: org.apache.kafka.common.serialization.StringSerializer
+            consumer:
+              value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            properties:
+              schema.registry.url: http://localhost:9085
+        schema-registry:
+          descriptor:
+            ports:
+              - 9085:8085
+        postgres:
+          descriptor:
+            ports:
+              - 9432:5432
+          connection-details:
+            url: jdbc:postgresql://localhost:9432/test-db
+        wiremock:
+          descriptor:
+            ports:
+              - 9459:8080
+          connection-details:
+            host: localhost
+            port: 9459
+
+    kubernetes:
+      services:
+        kafka:
+          descriptor:
+            ports:
+              - 32092:9093
+            env:
+              KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9092,EXTERNAL://localhost:32092'
+          connection-details:
+            bootstrap-servers:
+              - localhost:32092
+            producer:
+              value-serializer: org.apache.kafka.common.serialization.StringSerializer
+            consumer:
+              value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            properties:
+              schema.registry.url: http://localhost:32085
+        schema-registry:
+          descriptor:
+            ports:
+              - 32085:8085
+        postgres:
+          descriptor:
+            ports:
+              - 32432:5432
+          connection-details:
+            url: jdbc:postgresql://localhost:32432/test-db
+        wiremock:
+          descriptor:
+            ports:
+              - 32189:8080
+          connection-details:
+            host: localhost
+            port: 32189

@@ -1,0 +1,20 @@
+jarvis:
+  deployment:
+    docker:
+      services:
+        wiremock:
+          descriptor:
+            container-name: wiremock
+            image: 'wiremock/wiremock'
+          connection-details:
+            host: localhost
+            port: 8080
+
+    kubernetes:
+      services:
+        wiremock:
+          descriptor:
+            yaml: 'classpath:/k8s/wiremock.yaml'
+          connection-details:
+            host: wiremock
+            port: 8080

@@ -1,0 +1,5 @@
+com.github.markostijak.jarvis.engine.api.JarvisLifecycleListener=\
+    com.github.markostijak.jarvis.deployment.kubernetes.listeners.KubernetesInitializationListener,\
+    com.github.markostijak.jarvis.deployment.kubernetes.listeners.KubernetesAvailabilityListener,\
+    com.github.markostijak.jarvis.deployment.kubernetes.listeners.KubernetesNamespaceListener,\
+    com.github.markostijak.jarvis.deployment.kubernetes.listeners.KubernetesDeploymentListener

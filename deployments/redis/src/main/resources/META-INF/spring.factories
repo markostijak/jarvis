@@ -1,3 +1,0 @@
-com.mscode.jarvis.deployment.redis.DeployRedis=\
-com.mscode.jarvis.deployment.redis.RedisConfiguration,\
-org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration

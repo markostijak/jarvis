@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "jarvis.deployment.scope",
+      "type": "com.github.markostijak.jarvis.deployment.core.api.Scope",
+      "description": "Predefined scopes: 'CLASS', 'PACKAGE' and 'JVM'.",
+      "defaultValue": "CLASS"
+    }
+  ]
+}

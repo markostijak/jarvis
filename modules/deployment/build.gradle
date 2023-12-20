@@ -1,0 +1,16 @@
+
+jar {
+    enabled = false
+}
+
+publishMavenPublicationToMavenLocal.onlyIf {  false  }
+
+subprojects {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                artifactId "jarvis-deployment-${project.name}"
+            }
+        }
+    }
+}
