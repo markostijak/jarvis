@@ -6,16 +6,15 @@ import static com.github.markostijak.jarvis.deployment.core.internal.Labels.SCOP
 import static com.github.markostijak.jarvis.deployment.docker.listeners.DockerNetworkListener.NETWORK;
 import static com.github.markostijak.jarvis.engine.api.JarvisContext.JARVIS;
 
+import java.util.Map;
+import java.util.function.Consumer;
+
+import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.markostijak.jarvis.deployment.core.annotations.Deployment;
 import com.github.markostijak.jarvis.deployment.core.internal.utils.Deployments;
 import com.github.markostijak.jarvis.deployment.core.internal.utils.Utils;
 import com.github.markostijak.jarvis.deployment.docker.utils.DockerUtils;
 import com.github.markostijak.jarvis.engine.api.JarvisTestContext;
-
-import java.util.Map;
-import java.util.function.Consumer;
-
-import com.github.dockerjava.api.command.CreateContainerCmd;
 import lombok.RequiredArgsConstructor;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;

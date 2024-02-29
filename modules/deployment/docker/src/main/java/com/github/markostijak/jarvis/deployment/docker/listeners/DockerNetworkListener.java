@@ -7,16 +7,15 @@ import static com.github.markostijak.jarvis.deployment.docker.listeners.DockerIn
 import static com.github.markostijak.jarvis.deployment.docker.listeners.DockerInitializationListener.DOCKER_DEPLOYMENT_PROPERTIES;
 import static com.github.markostijak.jarvis.engine.api.JarvisContext.JARVIS;
 
-import com.github.markostijak.jarvis.deployment.core.api.Scope;
-import com.github.markostijak.jarvis.deployment.docker.DockerDeploymentProperties;
-import com.github.markostijak.jarvis.engine.api.JarvisContext;
-import com.github.markostijak.jarvis.engine.api.JarvisLifecycleListener;
-
 import java.util.List;
 import java.util.Map;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Network;
+import com.github.markostijak.jarvis.deployment.core.api.Scope;
+import com.github.markostijak.jarvis.deployment.docker.DockerDeploymentProperties;
+import com.github.markostijak.jarvis.engine.api.JarvisContext;
+import com.github.markostijak.jarvis.engine.api.JarvisLifecycleListener;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -42,25 +41,30 @@ public class DockerNetworkListener implements JarvisLifecycleListener {
             return;
         }
 
-        String networkId = client.createNetworkCmd()
+        client.createNetworkCmd()
                 .withName(name)
                 .withLabels(Map.of(
                         NAME, name,
                         RUNNER, JARVIS,
                         SCOPE, Scope.JVM.name()
-                )).exec().getId();
+                )).exec();
 
-        log.debug("Created a new network: '{}'", networkId);
-        context.setAttribute(NETWORK, networkId);
+        Network network = client.listNetworksCmd()
+                .withNameFilter(name)
+                .exec()
+                .get(0);
+
+        log.debug("Created a new network: '{}'", network.getName());
+        context.setAttribute(NETWORK, network);
     }
 
     @Override
     public void afterAll(JarvisContext context) {
-        String networkId = (String) context.removeAttribute(NETWORK);
+        Network network = (Network) context.removeAttribute(NETWORK);
 
-        if (networkId != null) {
-            client.removeNetworkCmd(networkId).exec();
-            log.debug("Deleted {} network", networkId);
+        if (network != null) {
+            client.removeNetworkCmd(network.getName()).exec();
+            log.debug("Deleted {} network", network.getName());
         }
     }
 
