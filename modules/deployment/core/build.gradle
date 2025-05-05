@@ -1,0 +1,5 @@
+group = 'com.github.markostijak.jarvis.deployment'
+
+dependencies {
+    api project(':modules:engine')
+}

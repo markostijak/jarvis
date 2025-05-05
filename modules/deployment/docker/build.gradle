@@ -1,0 +1,6 @@
+group = 'com.github.markostijak.jarvis.deployment'
+
+dependencies {
+    api project(':modules:deployment:core')
+    implementation group: 'org.testcontainers', name: 'testcontainers', version: '1.20.0'
+}

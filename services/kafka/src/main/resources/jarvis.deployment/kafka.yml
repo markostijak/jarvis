@@ -1,0 +1,71 @@
+jarvis:
+  deployment:
+    docker:
+      services:
+        kafka:
+          descriptor:
+            container-name: kafka
+            image: 'lensesio/fast-data-dev'
+            env:
+              RUNTESTS: 0
+              SAMPLEDATA: 0
+              RUNNING_SAMPLEDATA: 0
+              KAFKA_ZOOKEEPER_CONNECT: 'kafka:2181'
+              KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
+              KAFKA_LISTENERS: 'INTERNAL://:29092,EXTERNAL://:9092'
+              KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:29092,EXTERNAL://localhost:9092'
+              KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
+          connection-details:
+            bootstrap-servers:
+              - kafka:29092
+            producer:
+              client-id: jarvis-client
+              key-serializer: org.apache.kafka.common.serialization.StringSerializer
+              value-serializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
+            consumer:
+              group-id: jarvis-consumer
+              key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+              value-deserializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer
+              properties:
+                commit.interval.ms: 5000
+                auto.offset.reset: earliest
+            properties:
+              schema.registry.url: http://schema-registry:8085
+              auto.register.schemas: true
+              use.newest.model: true
+              derive.type: true
+              basic.auth:
+                credentials.source: USER_INFO
+                user.info: ":"
+              security:
+                protocol: PLAINTEXT
+
+    kubernetes:
+      services:
+        kafka:
+          descriptor:
+            yaml: 'classpath:/k8s/kafka.yaml'
+          connection-details:
+            bootstrap-servers:
+              - kafka:29092
+            producer:
+              client-id: jarvis-client
+              key-serializer: org.apache.kafka.common.serialization.StringSerializer
+              value-serializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
+            consumer:
+              group-id: jarvis-consumer
+              key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+              value-deserializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer
+              properties:
+                commit.interval.ms: 5000
+                auto.offset.reset: latest
+            properties:
+              schema.registry.url: http://schema-registry:8085
+              auto.register.schemas: true
+              use.newest.model: true
+              derive.type: true
+              basic.auth:
+                credentials.source: USER_INFO
+                user.info: ":"
+              security:
+                protocol: PLAINTEXT

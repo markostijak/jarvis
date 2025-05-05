@@ -1,0 +1,11 @@
+//file:noinspection DependencyNotationArgument
+
+group = 'com.github.markostijak.jarvis.service'
+
+dependencies {
+    compileOnly project(':modules:deployment:docker')
+    compileOnly project(':modules:deployment:kubernetes')
+
+    api group: 'org.wiremock', name: 'wiremock', version: '3.6.0'
+    api group: 'org.jetbrains', name: 'annotations', version: "${jbAnnotationsVersion}"
+}

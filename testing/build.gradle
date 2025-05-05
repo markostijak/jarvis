@@ -1,0 +1,14 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    testImplementation project(':modules:engine')
+    testImplementation project(':modules:deployment:core')
+    testImplementation project(':modules:deployment:docker')
+
+    testImplementation project(':services:redis')
+    testImplementation project(':services:kafka')
+    testImplementation project(':services:postgres')
+    testImplementation project(':services:wiremock')
+}
+
+group = 'com.github.markostijak.jarvis.testing'

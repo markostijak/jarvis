@@ -1,0 +1,11 @@
+//file:noinspection DependencyNotationArgument
+
+group = 'com.github.markostijak.jarvis.service'
+
+dependencies {
+    compileOnly project(':modules:deployment:docker')
+    compileOnly project(':modules:deployment:kubernetes')
+
+    implementation group: 'org.springframework.kafka', name: 'spring-kafka'
+    runtimeOnly group: 'io.confluent', name: 'kafka-protobuf-serializer', version: '7.4.0'
+}

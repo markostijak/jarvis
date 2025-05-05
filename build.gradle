@@ -1,0 +1,53 @@
+//file:noinspection DependencyNotationArgument
+
+plugins {
+    id "io.spring.dependency-management" version "1.1.0"
+}
+
+group "com.github.markostijak.jarvis"
+
+ext {
+    // spring boot
+    springBootVersion = "3.2.3"
+    // jetbrains annotations
+    jbAnnotationsVersion = "24.0.1"
+}
+
+subprojects {
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "io.spring.dependency-management"
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "https://packages.confluent.io/maven"
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
+        }
+    }
+
+    dependencies {
+        compileOnly group: "org.projectlombok", name: "lombok"
+        annotationProcessor group: "org.projectlombok", name: "lombok"
+
+        annotationProcessor group: "org.springframework.boot", name: "spring-boot-configuration-processor"
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    group = 'com.github.markostijak.jarvis'
+    version "1.0.0-dev"
+}

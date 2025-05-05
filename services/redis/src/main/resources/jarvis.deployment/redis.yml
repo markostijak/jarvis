@@ -1,0 +1,20 @@
+jarvis:
+  deployment:
+    docker:
+      services:
+        redis:
+          descriptor:
+            container-name: redis
+            image: 'redis'
+          connection-details:
+            host: localhost
+            port: 6379
+
+    kubernetes:
+      services:
+        redis:
+          descriptor:
+            yaml: 'classpath:k8s/redis.yaml'
+          connection-details:
+            host: redis
+            port: 6379

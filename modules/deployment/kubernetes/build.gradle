@@ -1,0 +1,6 @@
+group = 'com.github.markostijak.jarvis.deployment'
+
+dependencies {
+    api project(':modules:deployment:core')
+    implementation group: 'io.fabric8', name: 'kubernetes-client', version: '6.5.1'
+}

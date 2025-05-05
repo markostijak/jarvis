@@ -1,0 +1,11 @@
+//file:noinspection DependencyNotationArgument
+
+group = 'com.github.markostijak.jarvis.service'
+
+dependencies {
+    compileOnly project(':modules:deployment:docker')
+    compileOnly project(':modules:deployment:kubernetes')
+
+    implementation group: 'org.springframework.data', name: 'spring-data-jdbc'
+    runtimeOnly group: 'org.postgresql', name: 'postgresql'
+}

@@ -1,0 +1,4 @@
+com.github.markostijak.jarvis.engine.api.JarvisLifecycleListener=\
+    com.github.markostijak.jarvis.deployment.docker.listeners.DockerInitializationListener,\
+    com.github.markostijak.jarvis.deployment.docker.listeners.DockerAvailabilityListener,\
+    com.github.markostijak.jarvis.deployment.docker.listeners.DockerNetworkListener

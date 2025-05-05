@@ -1,0 +1,59 @@
+name: $(BuildDefinitionName)-$(BuildId)_$(Date:yyyyMMdd)_$(SourceBranchName)
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: publish
+    displayName: 'Publish Maven package'
+    type: boolean
+    default: false
+
+trigger:
+  batch: false
+  branches:
+    include:
+      - 'main'
+  paths:
+    exclude:
+      - README.md
+
+stages:
+  - stage: Build
+    displayName: 'Build Java'
+    jobs:
+      - job: Build
+        displayName: 'Build'
+        continueOnError: false
+        workspace:
+          clean: all
+        steps:
+          - task: Gradle@2
+            displayName: 'Execute gradle build'
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+            inputs:
+              gradleWrapperFile: 'gradlew'
+              tasks: 'build'
+              publishJUnitResults: false
+              testResultsFiles: '**/TEST-*.xml'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              sonarQubeRunAnalysis: false
+              sqGradlePluginVersionChoice: 'build'
+              checkStyleRunAnalysis: false
+              spotBugsAnalysis: false
+
+          - task: Gradle@2
+            displayName: 'Publish to Azure Artifacts'
+            condition: and(succeeded(), or(in(variables['Build.SourceBranch'], 'refs/heads/main'), eq('${{ parameters.publish }}', true) ) )
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+            inputs:
+              gradleWrapperFile: 'gradlew'
+              tasks: 'publish'
+              publishJUnitResults: false
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              sonarQubeRunAnalysis: false
+              spotBugsAnalysis: false

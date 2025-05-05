@@ -1,0 +1,4 @@
+com.github.markostijak.jarvis.engine.api.JarvisLifecycleListener=\
+    com.github.markostijak.jarvis.deployment.core.internal.listeners.InitializationListener,\
+    com.github.markostijak.jarvis.deployment.core.internal.listeners.DeploymentListener,\
+    com.github.markostijak.jarvis.deployment.core.internal.listeners.LoggingListener,

@@ -1,0 +1,8 @@
+//file:noinspection DependencyNotationArgument
+
+group = 'com.github.markostijak.jarvis.runner'
+
+dependencies {
+    compileOnly group: 'org.slf4j', name: 'slf4j-api'
+    implementation group: 'org.junit.platform', name: 'junit-platform-launcher'
+}

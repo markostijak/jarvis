@@ -1,0 +1,93 @@
+spring:
+  profiles:
+    active: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+jarvis:
+  deployment:
+    docker:
+      services:
+        kafka:
+          descriptor:
+            container-name: 'jarvis-kafka'
+            ports:
+              - 9092:9092
+              - 9085:8085
+            env:
+              KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9092,EXTERNAL://localhost:9092'
+          connection-details:
+            bootstrap-servers:
+              - localhost:9092
+            producer:
+              value-serializer: org.apache.kafka.common.serialization.StringSerializer
+            consumer:
+              value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            properties:
+              schema.registry.url: http://localhost:9085
+        postgres:
+          descriptor:
+            container-name: 'jarvis-postgres'
+            ports:
+              - 9432:5432
+          connection-details:
+            url: jdbc:postgresql://localhost:9432/test-db
+        wiremock:
+          descriptor:
+            container-name: 'jarvis-wiremock'
+            ports:
+              - 9459:8080
+          connection-details:
+            host: localhost
+            port: 9459
+        redis:
+          descriptor:
+            container-name: 'jarvis-redis'
+            ports:
+              - 9732:6732
+          connection-details:
+            host: localhost
+            port: 9732
+
+    kubernetes:
+      services:
+        kafka:
+          descriptor:
+            ports:
+              - 39092:9092
+              - 39085:8085
+            env:
+              KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9092,EXTERNAL://localhost:39092'
+          connection-details:
+            bootstrap-servers:
+              - localhost:39092
+            producer:
+              value-serializer: org.apache.kafka.common.serialization.StringSerializer
+            consumer:
+              value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            properties:
+              schema.registry.url: http://localhost:39085
+        postgres:
+          descriptor:
+            ports:
+              - 39432:5432
+          connection-details:
+            url: jdbc:postgresql://localhost:39432/test-db
+        wiremock:
+          descriptor:
+            ports:
+              - 39459:8080
+          connection-details:
+            host: localhost
+            port: 39459
+        redis:
+          descriptor:
+            ports:
+              - 39632:6732
+          connection-details:
+            host: localhost
+            port: 39632
