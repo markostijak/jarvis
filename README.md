@@ -6,11 +6,10 @@ or third party services needed during e2e testing.
 
 # Getting Started
 
-To kickstart your journey with Jarvis, simply include the
-following [dependency](https://dev.azure.com/gourban/Core/_artifacts/feed/backend/maven/com.github.markostijak.jarvis.engine%2Fjarvis-engine/overview/0.0.1.49242-PR_10639) in your project:
+To kickstart your journey with Jarvis, include the following dependency in your project:
 
 ```
-testImplementation group: 'com.github.markostijak.jarvis.engine', name: 'jarvis-engine', version: '0.0.1.xxxxx-main'
+testImplementation group: 'com.github.markostijak.jarvis.engine', name: 'jarvis-engine', version: '1.0.x'
 ```
 
 As Jarvis depends on the Spring Test Framework, it is important to include

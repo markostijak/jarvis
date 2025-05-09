@@ -2,7 +2,7 @@
 
 By implementing `JarvisLifecycleListener` interface, it is very easy to extend Jarvis with additional
 features and functionalities. The `jarvis-deployment-core`, `jarvis-deployment-docker` and `jarvis-deployment-kubernetes`
-modules ate Jarvis extensions that adds an **annotation-driven** support for deploying services as Docker
+modules are Jarvis extensions that adds an **annotation-driven** support for deploying services as Docker
 containers or as Kubernetes resources.
 
 # Getting Started
@@ -10,16 +10,16 @@ containers or as Kubernetes resources.
 The first step is to add one of the following dependencies to your `gradle.build` files:
 
 ```
-testImplementation group: 'com.github.markostijak.jarvis.deployment', name: 'jarvis-deployment-docker', version: '0.0.1.xxxxx-main'
+testImplementation group: 'com.github.markostijak.jarvis.deployment', name: 'jarvis-docker-starter', version: '1.0.x'
 ```
 
 or
 
 ```
-testImplementation group: 'com.github.markostijak.jarvis.deployment', name: 'jarvis-deployment-kubernetes', version: '0.0.1.xxxxx-main'
+testImplementation group: 'com.github.markostijak.jarvis.deployment', name: 'jarvis-kubernetes-starter', version: '1.0.x'
 ```
 
-Once the `jarvis-deployment-docker` or `jarvis-deployment-kubernetes` is on your classpath, you can use `@Deploy("name")`
+Once the `jarvis-docker-starter` or `jarvis-kubernetes-starter` are on your classpath, you can use `@Deploy("name")`
 annotation to specify which service should be deployed for the test class.
 
 ## API Reference
