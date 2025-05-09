@@ -1,5 +1,8 @@
 description = "Starter for using Docker with Jarvis"
 
+group = 'com.github.markostijak.jarvis.starter'
+published = true
+
 dependencies {
     api project(':modules:engine')
     api project(':modules:deployment:core')

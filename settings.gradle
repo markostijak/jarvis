@@ -14,8 +14,8 @@ include 'starters:docker-starter'
 include 'starters:kubernetes-starter'
 
 // services
-file('services').eachDir {
-    include 'services:' + it.name
+file('services').eachDir { service ->
+    include 'services:' + service.name
 }
 
 include 'testing'

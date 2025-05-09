@@ -1,6 +1,7 @@
 //file:noinspection DependencyNotationArgument
 
-group = 'com.github.markostijak.jarvis.runner'
+group = 'com.github.markostijak.jarvis'
+published = true
 
 dependencies {
     compileOnly group: 'org.slf4j', name: 'slf4j-api'

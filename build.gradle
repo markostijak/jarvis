@@ -18,11 +18,42 @@ subprojects {
     apply plugin: "maven-publish"
     apply plugin: "io.spring.dependency-management"
 
+    ext {
+        published = false
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
         maven {
             url "https://packages.confluent.io/maven"
+        }
+    }
+
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/markostijak/jarvis")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
+            }
+        }
+        publications {
+            gpr(MavenPublication) {
+                versionMapping {
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
+                }
+                artifactId project.name
+                from(components.java)
+            }
         }
     }
 
@@ -50,4 +81,7 @@ subprojects {
 
     group = 'com.github.markostijak.jarvis'
     version "1.0.0-dev"
+
+    publishGprPublicationToMavenLocal.onlyIf { project.published }
+    publishGprPublicationToGitHubPackagesRepository.onlyIf { project.published }
 }

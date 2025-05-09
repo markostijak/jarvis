@@ -1,4 +1,5 @@
 group = 'com.github.markostijak.jarvis.deployment'
+published = true
 
 dependencies {
     api project(':modules:deployment:core')
