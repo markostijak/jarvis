@@ -1,17 +1,21 @@
 rootProject.name = "jarvis"
 
-include 'modules'
-include 'modules:runner'
+// core
 include 'modules:engine'
-include 'modules:deployment'
+include 'modules:runner'
+
+// deployment
 include 'modules:deployment:core'
 include 'modules:deployment:docker'
 include 'modules:deployment:kubernetes'
 
-include 'services'
-include 'services:kafka'
-include 'services:postgres'
-include 'services:redis'
-include 'services:wiremock'
+// starters
+include 'starters:docker-starter'
+include 'starters:kubernetes-starter'
+
+// services
+file('services').eachDir {
+    include 'services:' + it.name
+}
 
 include 'testing'

@@ -7,7 +7,6 @@ import com.github.markostijak.jarvis.services.redis.DeployRedis;
 import com.github.markostijak.jarvis.services.wiremock.DeployWireMock;
 import com.github.markostijak.jarvis.services.wiremock.WireMockClient;
 import com.github.markostijak.jarvis.testing.components.TestConfiguration;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

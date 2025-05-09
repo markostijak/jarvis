@@ -1,5 +1,0 @@
-group = 'com.github.markostijak.jarvis.service'
-
-jar {
-    enabled = false
-}

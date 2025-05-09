@@ -8,9 +8,9 @@ group "com.github.markostijak.jarvis"
 
 ext {
     // spring boot
-    springBootVersion = "3.2.3"
+    springBootVersion = "3.4.5"
     // jetbrains annotations
-    jbAnnotationsVersion = "24.0.1"
+    jbAnnotationsVersion = "26.0.2"
 }
 
 subprojects {

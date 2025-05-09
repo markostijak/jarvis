@@ -6,9 +6,9 @@ import com.github.markostijak.jarvis.deployment.core.api.ServiceFactory;
 import com.github.markostijak.jarvis.deployment.core.internal.utils.Deployments;
 import com.github.markostijak.jarvis.deployment.core.support.DeploymentRepository;
 import com.github.markostijak.jarvis.engine.api.JarvisTestContext;
-
 import lombok.RequiredArgsConstructor;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 
 @RequiredArgsConstructor
 public class DockerServiceFactory implements ServiceFactory {
@@ -22,7 +22,8 @@ public class DockerServiceFactory implements ServiceFactory {
         var logDirectory = Deployments.resolveDirectoryFor(context, deployment);
         var customizer = new DockerDeploymentCustomizer(deployment, context, descriptor);
 
-        GenericContainer<?> container = new GenericContainer<>(descriptor.getImage())
+        DockerImageName dockerImageName = DockerImageName.parse(descriptor.getImage());
+        GenericContainer<?> container = new GenericContainer<>(dockerImageName)
                 .withCreateContainerCmdModifier(customizer::accept);
 
         customizer.accept(container);

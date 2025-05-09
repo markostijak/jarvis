@@ -19,7 +19,7 @@ jarvis:
               - 9092:9092
               - 9085:8085
             env:
-              KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9092,EXTERNAL://localhost:9092'
+              KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://jarvis-kafka:9092,EXTERNAL://localhost:9092'
           connection-details:
             bootstrap-servers:
               - localhost:9092

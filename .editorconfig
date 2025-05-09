@@ -12,7 +12,7 @@ ij_visual_guides = 200
 [*.java]
 ij_java_blank_lines_after_package = 1
 ij_java_blank_lines_after_imports = 1
-ij_java_imports_layout = $*, |, co.gourban.**, |, com.github.markostijak.**, |, java.**, jakarta.**, javax.**, |, *
+ij_java_imports_layout = $*, |, com.github.markostijak.**, |, java.**, jakarta.**, javax.**, |, *
 ij_java_class_count_to_use_import_on_demand = 999
 ij_java_names_count_to_use_import_on_demand = 999
 ij_formatter_enabled = true

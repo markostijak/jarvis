@@ -1,14 +1,11 @@
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    testImplementation project(':modules:engine')
-    testImplementation project(':modules:deployment:core')
-    testImplementation project(':modules:deployment:docker')
+    testImplementation project(':starters:docker-starter')
 
-    testImplementation project(':services:redis')
-    testImplementation project(':services:kafka')
-    testImplementation project(':services:postgres')
-    testImplementation project(':services:wiremock')
+    file('../services').eachDir { service ->
+        testImplementation project(':services:' + service.name)
+    }
 }
 
 group = 'com.github.markostijak.jarvis.testing'

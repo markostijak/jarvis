@@ -6,19 +6,23 @@ import static com.github.markostijak.jarvis.deployment.core.internal.Labels.SCOP
 import static com.github.markostijak.jarvis.deployment.docker.listeners.DockerNetworkListener.NETWORK;
 import static com.github.markostijak.jarvis.engine.api.JarvisContext.JARVIS;
 
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.markostijak.jarvis.deployment.core.annotations.Deployment;
 import com.github.markostijak.jarvis.deployment.core.internal.utils.Deployments;
 import com.github.markostijak.jarvis.deployment.core.internal.utils.Utils;
 import com.github.markostijak.jarvis.deployment.docker.utils.DockerUtils;
 import com.github.markostijak.jarvis.engine.api.JarvisTestContext;
-
-import java.util.Map;
-import java.util.function.Consumer;
-
-import com.github.dockerjava.api.command.CreateContainerCmd;
 import lombok.RequiredArgsConstructor;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 
 @RequiredArgsConstructor
 public class DockerDeploymentCustomizer implements Consumer<Object> {
@@ -46,7 +50,7 @@ public class DockerDeploymentCustomizer implements Consumer<Object> {
 
         container.withEnv(envs)
                 .withNetwork(network)
-                .withExposedPorts(exposedPorts)
+//                .withExposedPorts(exposedPorts)
                 .withLabels(Map.of(
                         RUNNER, JARVIS,
                         DEPLOYMENT, deployment.name(),
